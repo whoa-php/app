@@ -1,18 +1,24 @@
-<?php namespace App\Api;
+<?php
 
-use App\Data\Models\CommonFields;
+declare(strict_types=1);
+
+namespace App\Api;
+
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Exception;
-use Limoncello\Contracts\Authentication\AccountManagerInterface;
-use Limoncello\Contracts\Authorization\AuthorizationManagerInterface;
-use Limoncello\Contracts\Exceptions\AuthorizationExceptionInterface;
-use Limoncello\Contracts\Passport\PassportAccountInterface;
-use Limoncello\Flute\Adapters\ModelQueryBuilder;
-use Limoncello\Flute\Api\Crud;
-use Limoncello\Flute\Contracts\Models\PaginatedDataInterface;
+use Whoa\Contracts\Authentication\AccountManagerInterface;
+use Whoa\Contracts\Authorization\AuthorizationManagerInterface;
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Contracts\Data\UuidFields;
+use Whoa\Contracts\Exceptions\AuthorizationExceptionInterface;
+use Whoa\Contracts\Passport\PassportAccountInterface;
+use Whoa\Doctrine\Traits\UuidTypeTrait;
+use Whoa\Flute\Adapters\ModelQueryBuilder;
+use Whoa\Flute\Api\Crud;
+use Whoa\Flute\Contracts\Models\PaginatedDataInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -23,9 +29,11 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 abstract class BaseApi extends Crud
 {
+    use UuidTypeTrait;
+
     /**
      * @param               $index
-     * @param string        $name
+     * @param string $name
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
      *
@@ -43,8 +51,8 @@ abstract class BaseApi extends Crud
     /**
      * Authorize action for current user.
      *
-     * @param string          $action
-     * @param string|null     $resourceType
+     * @param string $action
+     * @param string|null $resourceType
      * @param string|int|null $resourceIdentity
      *
      * @return void
@@ -53,7 +61,7 @@ abstract class BaseApi extends Crud
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected function authorize(string $action, string $resourceType = null, $resourceIdentity = null)
+    protected function authorize(string $action, string $resourceType = null, $resourceIdentity = null): void
     {
         /** @var AuthorizationManagerInterface $manager */
         $manager = $this->getContainer()->get(AuthorizationManagerInterface::class);
@@ -67,7 +75,8 @@ abstract class BaseApi extends Crud
      */
     protected function builderSaveResourceOnCreate(ModelQueryBuilder $builder): ModelQueryBuilder
     {
-        return $this->addCreatedAt(parent::builderSaveResourceOnCreate($builder));
+        $addCreatedAt = $this->addCreatedAt(parent::builderSaveResourceOnCreate($builder));
+        return $this->addUuid($addCreatedAt);
     }
 
     /**
@@ -112,7 +121,7 @@ abstract class BaseApi extends Crud
     {
         // `Doctrine` specifics: `setValue` works for inserts and `set` for updates
         $timestamp = $this->convertDateTimeToDbValue($builder, new DateTimeImmutable());
-        $builder->setValue(CommonFields::FIELD_CREATED_AT, $builder->createNamedParameter($timestamp));
+        $builder->setValue(TimestampFields::FIELD_CREATED_AT, $builder->createNamedParameter($timestamp));
 
         return $builder;
     }
@@ -129,27 +138,34 @@ abstract class BaseApi extends Crud
     {
         // `Doctrine` specifics: `setValue` works for inserts and `set` for updates
         $timestamp = $this->convertDateTimeToDbValue($builder, new DateTimeImmutable());
-        $builder->set(CommonFields::FIELD_UPDATED_AT, $builder->createNamedParameter($timestamp));
+        $builder->set(TimestampFields::FIELD_UPDATED_AT, $builder->createNamedParameter($timestamp));
 
         return $builder;
     }
 
     /**
-     * @param QueryBuilder      $builder
+     * @param ModelQueryBuilder $builder
+     * @return ModelQueryBuilder
+     */
+    protected function addUuid(ModelQueryBuilder $builder): ModelQueryBuilder
+    {
+        $builder->setValue(UuidFields::FIELD_UUID, $builder->createNamedParameter($this->uuid()));
+
+        return $builder;
+    }
+
+    /**
+     * @param QueryBuilder $builder
      * @param DateTimeInterface $dateTime
      *
      * @return string
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
      *
      * @throws DBALException
      */
     protected function convertDateTimeToDbValue(QueryBuilder $builder, DateTimeInterface $dateTime): string
     {
         $dbDateTimeFormat = $builder->getConnection()->getDatabasePlatform()->getDateTimeFormatString();
-        $value            = $dateTime->format($dbDateTimeFormat);
-
-        return $value;
+        return $dateTime->format($dbDateTimeFormat);
     }
 
     /**
@@ -166,9 +182,7 @@ abstract class BaseApi extends Crud
         /** @var PassportAccountInterface $account */
         $manager = $this->getContainer()->get(AccountManagerInterface::class);
         $account = $manager->getAccount();
-        $userId  = $account->getUserIdentity();
-
-        return $userId;
+        return $account->getUserIdentity();
     }
 
     /**

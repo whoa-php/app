@@ -1,12 +1,19 @@
-<?php namespace App\Data\Seeds;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Data\Seeds;
 
 use App\Data\Models\User as Model;
-use Doctrine\DBAL\DBALException;
-use Faker\Generator;
-use Limoncello\Contracts\Data\SeedInterface;
-use Limoncello\Crypt\Contracts\HasherInterface;
-use Limoncello\Data\Seeds\SeedTrait;
-use Psr\Container\ContainerInterface;
+use Doctrine\DBAL\Exception as DBALException;
+use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Whoa\Contracts\Data\SeedInterface;
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Contracts\Data\UuidFields;
+use Whoa\Crypt\Contracts\HasherInterface;
+use Whoa\Data\Seeds\SeedTrait;
 
 /**
  * @package App
@@ -15,37 +22,66 @@ class UsersSeed implements SeedInterface
 {
     use SeedTrait;
 
-    const NUMBER_OF_RECORDS = 6;
+    /** @var string Field value */
+    public const DEFAULT_PASSWORD = 'p@ssword';
 
-    const DEFAULT_PASSWORD = 'secret';
+    /** @var int Field value */
+    public const ID_DEFAULT_ADMINISTRATOR = 1;
+    /** @var string Field value */
+    public const ROLE_DEFAULT_ADMINISTRATOR = RolesSeed::ID_ADMINISTRATORS;
+    /** @var string Field value */
+    public const EMAIL_DEFAULT_ADMINISTRATOR = 'administrator@local.domain';
+
+    /** @var int Field value */
+    public const ID_DEFAULT_MODERATOR = 2;
+    /** @var string Field value */
+    public const ROLE_DEFAULT_MODERATOR = RolesSeed::ID_MODERATORS;
+    /** @var string Field value */
+    public const EMAIL_DEFAULT_MODERATOR = 'moderator@local.domain';
+
+    /** @var int Field value */
+    public const ID_DEFAULT_USER = 3;
+    /** @var string Field value */
+    public const ROLE_DEFAULT_USER = RolesSeed::ID_USERS;
+    /** @var string Field value */
+    public const EMAIL_DEFAULT_USER = 'user@local.domain';
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception
      */
     public function run(): void
     {
-        $this->seedModelsData(self::NUMBER_OF_RECORDS, Model::class, function (ContainerInterface $container) {
-            /** @var Generator $faker */
-            $faker = $container->get(Generator::class);
-            /** @var HasherInterface $hasher */
-            $hasher = $container->get(HasherInterface::class);
+        $hasher = $this->getContainer()->get(HasherInterface::class);
 
-            $role = $faker->randomElement([
-                RolesSeed::ROLE_ADMIN,
-                RolesSeed::ROLE_MODERATOR,
-                RolesSeed::ROLE_USER,
-            ]);
+        $this->seedModelData(Model::class, [
+            Model::FIELD_ID => self::ID_DEFAULT_ADMINISTRATOR,
+            UuidFields::FIELD_UUID => $this->uuid(),
+            Model::FIELD_ID_ROLE => self::ROLE_DEFAULT_ADMINISTRATOR,
+            Model::FIELD_EMAIL => self::EMAIL_DEFAULT_ADMINISTRATOR,
+            Model::FIELD_PASSWORD_HASH => $hasher->hash(self::DEFAULT_PASSWORD),
+            TimestampFields::FIELD_CREATED_AT => $this->now(),
+        ]);
 
-            return [
-                Model::FIELD_FIRST_NAME    => $faker->firstName,
-                Model::FIELD_LAST_NAME     => $faker->lastName,
-                Model::FIELD_EMAIL         => $faker->email,
-                Model::FIELD_ID_ROLE       => $role,
-                Model::FIELD_PASSWORD_HASH => $hasher->hash(self::DEFAULT_PASSWORD),
-                Model::FIELD_CREATED_AT    => $this->now(),
-            ];
-        });
+        $this->seedModelData(Model::class, [
+            Model::FIELD_ID => self::ID_DEFAULT_MODERATOR,
+            UuidFields::FIELD_UUID => $this->uuid(),
+            Model::FIELD_ID_ROLE => self::ROLE_DEFAULT_MODERATOR,
+            Model::FIELD_EMAIL => self::EMAIL_DEFAULT_MODERATOR,
+            Model::FIELD_PASSWORD_HASH => $hasher->hash(self::DEFAULT_PASSWORD),
+            TimestampFields::FIELD_CREATED_AT => $this->now(),
+        ]);
+
+        $this->seedModelData(Model::class, [
+            Model::FIELD_ID => self::ID_DEFAULT_USER,
+            UuidFields::FIELD_UUID => $this->uuid(),
+            Model::FIELD_ID_ROLE => self::ROLE_DEFAULT_USER,
+            Model::FIELD_EMAIL => self::EMAIL_DEFAULT_USER,
+            Model::FIELD_PASSWORD_HASH => $hasher->hash(self::DEFAULT_PASSWORD),
+            TimestampFields::FIELD_CREATED_AT => $this->now(),
+        ]);
     }
 }

@@ -1,11 +1,17 @@
-<?php namespace App\Validation\User;
+<?php
 
+declare(strict_types=1);
+
+namespace App\Validation\User;
+
+use App\Json\Schemas\BaseSchema;
 use App\Json\Schemas\RoleSchema;
 use App\Json\Schemas\UserSchema as Schema;
 use App\Validation\User\UserRules as r;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
-use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
-use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Whoa\Flute\Contracts\Schema\SchemaInterface;
+use Whoa\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
+use Whoa\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
+use Whoa\Validation\Contracts\Rules\RuleInterface;
 use Settings\ApplicationApi;
 
 /**
@@ -27,11 +33,13 @@ class UsersReadQuery implements JsonApiQueryRulesInterface
     public static function getFilterRules(): ?array
     {
         return [
-            Schema::RESOURCE_ID                                   => static::getIdentityRule(),
-            Schema::ATTR_FIRST_NAME                               => r::asSanitizedString(),
-            Schema::ATTR_LAST_NAME                                => r::asSanitizedString(),
-            Schema::ATTR_CREATED_AT                               => r::asJsonApiDateTime(),
-            Schema::REL_ROLE                                      => r::asSanitizedString(),
+            SchemaInterface::RESOURCE_ID => static::getIdentityRule(),
+            BaseSchema::ATTR_UUID => r::asSanitizedUuid(),
+            Schema::ATTR_EMAIL => r::asSanitizedEmail(),
+            Schema::ATTR_DESCRIPTION => r::asSanitizedString(),
+            BaseSchema::ATTR_CREATED_AT => r::asJsonApiDateTime(),
+            Schema::REL_ROLE => r::asSanitizedString(),
+            Schema::REL_ROLE . '.' . RoleSchema::ATTR_NAME => r::asSanitizedString(),
             Schema::REL_ROLE . '.' . RoleSchema::ATTR_DESCRIPTION => r::asSanitizedString(),
         ];
     }
@@ -43,10 +51,10 @@ class UsersReadQuery implements JsonApiQueryRulesInterface
     {
         return [
             // if fields sets are given only the following fields are OK
-            Schema::TYPE     => r::inValues([
-                Schema::RESOURCE_ID,
-                Schema::ATTR_FIRST_NAME,
-                Schema::ATTR_LAST_NAME,
+            Schema::TYPE => r::inValues([
+                SchemaInterface::RESOURCE_ID,
+                Schema::ATTR_EMAIL,
+                Schema::ATTR_DESCRIPTION,
                 Schema::REL_ROLE,
             ]),
             // roles field sets could be any
@@ -59,12 +67,14 @@ class UsersReadQuery implements JsonApiQueryRulesInterface
      */
     public static function getSortsRule(): ?RuleInterface
     {
-        return r::isString(r::inValues([
-            Schema::RESOURCE_ID,
-            Schema::ATTR_FIRST_NAME,
-            Schema::ATTR_LAST_NAME,
-            Schema::REL_ROLE,
-        ]));
+        return r::isString(
+            r::inValues([
+                SchemaInterface::RESOURCE_ID,
+                Schema::ATTR_EMAIL,
+                Schema::ATTR_DESCRIPTION,
+                Schema::REL_ROLE,
+            ])
+        );
     }
 
     /**
@@ -72,9 +82,12 @@ class UsersReadQuery implements JsonApiQueryRulesInterface
      */
     public static function getIncludesRule(): ?RuleInterface
     {
-        return r::isString(r::inValues([
-            Schema::REL_ROLE,
-        ]));
+        return r::isString(
+            r::inValues([
+                Schema::REL_ROLE,
+                Schema::REL_OAUTH_TOKENS,
+            ])
+        );
     }
 
     /**

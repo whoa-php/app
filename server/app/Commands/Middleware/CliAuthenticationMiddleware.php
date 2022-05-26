@@ -1,9 +1,13 @@
-<?php namespace App\Commands\Middleware;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Commands\Middleware;
 
 use App\Api\UsersApi;
 use Closure;
-use Limoncello\Application\Commands\BaseImpersonationMiddleware;
-use Limoncello\Flute\Contracts\FactoryInterface;
+use Whoa\Application\Commands\BaseImpersonationMiddleware;
+use Whoa\Flute\Contracts\FactoryInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -12,7 +16,7 @@ use Psr\Container\ContainerInterface;
 class CliAuthenticationMiddleware extends BaseImpersonationMiddleware
 {
     /** Middleware handler */
-    const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
+    public const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
 
     /**
      * @inheritdoc

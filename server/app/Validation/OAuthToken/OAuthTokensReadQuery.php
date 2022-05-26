@@ -1,0 +1,132 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Validation\OAuthToken;
+
+use App\Json\Schemas\BaseSchema;
+use App\Json\Schemas\OAuthClientSchema;
+use App\Json\Schemas\OAuthTokenSchema as Schema;
+use App\Validation\OAuthToken\OAuthTokenRules as r;
+use Whoa\Flute\Contracts\Schema\SchemaInterface;
+use Whoa\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
+use Whoa\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
+use Whoa\Validation\Contracts\Rules\RuleInterface;
+use Settings\ApplicationApi;
+
+/**
+ * @package App
+ */
+class OAuthTokensReadQuery implements JsonApiQueryRulesInterface
+{
+    /**
+     * @inheritdoc
+     */
+    public static function getIdentityRule(): ?RuleInterface
+    {
+        return r::asSanitizedString();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFilterRules(): ?array
+    {
+        return [
+            SchemaInterface::RESOURCE_ID => static::getIdentityRule(),
+            BaseSchema::ATTR_UUID => r::asSanitizedUuid(),
+            Schema::ATTR_IS_SCOPE_MODIFIED => r::stringToBool(),
+            Schema::ATTR_IS_ENABLED => r::stringToBool(),
+            Schema::ATTR_REDIRECT_URI => r::asSanitizedUrl(),
+            Schema::ATTR_CODE => r::asSanitizedString(),
+            Schema::ATTR_VALUE => r::asSanitizedString(),
+            Schema::ATTR_TYPE => r::asSanitizedString(),
+            Schema::ATTR_REFRESH => r::asSanitizedString(),
+            Schema::ATTR_CODE_CREATED_AT => r::asJsonApiDateTime(),
+            Schema::ATTR_VALUE_CREATED_AT => r::asJsonApiDateTime(),
+            Schema::ATTR_REFRESH_CREATED_AT => r::asJsonApiDateTime(),
+            BaseSchema::ATTR_CREATED_AT => r::asJsonApiDateTime(),
+            BaseSchema::ATTR_UPDATED_AT => r::asJsonApiDateTime(),
+            Schema::REL_CLIENT => r::asSanitizedString(),
+            Schema::REL_CLIENT . '.' . SchemaInterface::RESOURCE_ID => r::asSanitizedString(),
+            Schema::REL_CLIENT . '.' . BaseSchema::ATTR_UUID => r::asSanitizedUuid(),
+            Schema::REL_CLIENT . '.' . OAuthClientSchema::ATTR_IDENTIFIER => r::asSanitizedString(),
+            Schema::REL_CLIENT . '.' . OAuthClientSchema::ATTR_NAME => r::asSanitizedString(),
+
+
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFieldSetRules(): ?array
+    {
+        return [
+            Schema::TYPE => r::inValues([
+                SchemaInterface::RESOURCE_ID,
+                BaseSchema::ATTR_UUID,
+                Schema::REL_CLIENT,
+                Schema::REL_CLIENT . '.' . SchemaInterface::RESOURCE_ID,
+                Schema::REL_CLIENT . '.' . BaseSchema::ATTR_UUID,
+                Schema::REL_CLIENT . '.' . OAuthClientSchema::ATTR_IDENTIFIER,
+                Schema::REL_CLIENT . '.' . OAuthClientSchema::ATTR_NAME,
+            ]),
+            OAuthClientSchema::TYPE => r::success(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSortsRule(): ?RuleInterface
+    {
+        return r::isString(
+            r::inValues([
+                SchemaInterface::RESOURCE_ID,
+                BaseSchema::ATTR_UUID,
+                Schema::ATTR_VALUE,
+                Schema::REL_CLIENT,
+                Schema::REL_CLIENT . '.' . SchemaInterface::RESOURCE_ID,
+                Schema::REL_CLIENT . '.' . BaseSchema::ATTR_UUID,
+                Schema::REL_CLIENT . '.' . OAuthClientSchema::ATTR_IDENTIFIER,
+                Schema::REL_CLIENT . '.' . OAuthClientSchema::ATTR_NAME,
+            ])
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getIncludesRule(): ?RuleInterface
+    {
+        return r::isString(
+            r::inValues([
+                Schema::REL_USER,
+                Schema::REL_CLIENT,
+                Schema::REL_SCOPES,
+            ])
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPageOffsetRule(): ?RuleInterface
+    {
+        // defaults are fine
+        return DefaultQueryValidationRules::getPageOffsetRule();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPageLimitRule(): ?RuleInterface
+    {
+        // defaults are fine
+        return DefaultQueryValidationRules::getPageLimitRuleForDefaultAndMaxSizes(
+            ApplicationApi::DEFAULT_PAGE_SIZE,
+            ApplicationApi::DEFAULT_MAX_PAGE_SIZE
+        );
+    }
+}

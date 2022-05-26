@@ -1,12 +1,16 @@
-<?php namespace App;
+<?php
 
-use Limoncello\Contracts\Core\SapiInterface;
+declare(strict_types=1);
+
+namespace App;
+
+use Whoa\Contracts\Core\SapiInterface;
 use Settings\Application as ApplicationSettings;
 
 /**
  * @package App
  */
-class Application extends \Limoncello\Application\Packages\Application\Application
+class Application extends \Whoa\Application\Packages\Application\Application
 {
     /**
      * @inheritdoc

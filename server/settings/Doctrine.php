@@ -1,7 +1,11 @@
-<?php namespace Settings;
+<?php
+
+declare(strict_types=1);
+
+namespace Settings;
 
 use Dotenv\Dotenv;
-use Limoncello\Application\Packages\Data\DoctrineSettings;
+use Whoa\Application\Packages\Data\DoctrineSettings;
 
 /**
  * @package Settings
@@ -20,18 +24,19 @@ class Doctrine extends DoctrineSettings
 
         return [
 
-            static::KEY_DATABASE_NAME => getenv('DB_DATABASE_NAME'),
-            static::KEY_USER_NAME     => getenv('DB_USER_NAME'),
-            static::KEY_PASSWORD      => getenv('DB_USER_PASSWORD'),
-            static::KEY_HOST          => getenv('DB_HOST'),
-            static::KEY_PORT          => getenv('DB_PORT'),
-            static::KEY_CHARSET       => getenv('DB_CHARSET'),
-            static::KEY_DRIVER        => getenv('DB_DRIVER'),
-            static::KEY_PATH          => $dbPath,
-            static::KEY_EXEC          => [
-                'PRAGMA foreign_keys = ON;'
-            ],
+                static::KEY_DATABASE_NAME => getenv('DB_DATABASE_NAME'),
+                static::KEY_USER_NAME => getenv('DB_USER_NAME'),
+                static::KEY_PASSWORD => getenv('DB_USER_PASSWORD'),
+                static::KEY_HOST => getenv('DB_HOST'),
+                static::KEY_PORT => getenv('DB_PORT'),
+                static::KEY_CHARSET => getenv('DB_CHARSET'),
+                static::KEY_DRIVER => getenv('DB_DRIVER'),
+                static::KEY_PATH => $dbPath,
+                static::KEY_EXEC => [
+                    // Enforces foreign keys specific to SQLite, enable if necessary.
+                    // 'PRAGMA foreign_keys = ON;'
+                ],
 
-        ] + parent::getSettings();
+            ] + parent::getSettings();
     }
 }

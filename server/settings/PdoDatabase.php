@@ -1,7 +1,11 @@
-<?php namespace Settings;
+<?php
+
+declare(strict_types=1);
+
+namespace Settings;
 
 //use Dotenv\Dotenv;
-//use Limoncello\Application\Packages\PDO\PdoSettings;
+//use Whoa\Application\Packages\PDO\PdoSettings;
 //
 ///**
 // * @package Settings

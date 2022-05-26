@@ -1,14 +1,16 @@
-<?php namespace App\Data\Migrations;
+<?php
 
+declare(strict_types=1);
+
+namespace App\Data\Migrations;
+
+use App\Data\Models\OAuthScope;
 use App\Data\Models\Role;
-use App\Data\Models\RoleScope as Model;
-use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Data\MigrationInterface;
-use Limoncello\Data\Migrations\MigrationTrait;
-use Limoncello\Data\Migrations\RelationshipRestrictions;
-use Limoncello\Passport\Entities\DatabaseSchema;
-use Limoncello\Passport\Entities\Scope;
+use App\Data\Models\RoleOAuthScope as Model;
+use Doctrine\DBAL\Exception as DBALException;
+use Whoa\Contracts\Data\MigrationInterface;
+use Whoa\Data\Migrations\MigrationTrait;
+use Whoa\Data\Migrations\RelationshipRestrictions;
 
 /**
  * @package App
@@ -19,7 +21,6 @@ class RolesScopesMigration implements MigrationInterface
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
      */
     public function migrate(): void
@@ -27,13 +28,7 @@ class RolesScopesMigration implements MigrationInterface
         $this->createTable(Model::class, [
             $this->primaryInt(Model::FIELD_ID),
             $this->foreignRelationship(Model::FIELD_ID_ROLE, Role::class, RelationshipRestrictions::CASCADE),
-            $this->foreignColumn(
-                Model::FIELD_ID_SCOPE,
-                DatabaseSchema::TABLE_SCOPES,
-                Scope::FIELD_ID,
-                Type::STRING,
-                true
-            ),
+            $this->foreignRelationship(Model::FIELD_ID_SCOPE, OAuthScope::class, RelationshipRestrictions::CASCADE),
             $this->timestamps(),
         ]);
     }

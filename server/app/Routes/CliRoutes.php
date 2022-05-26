@@ -1,15 +1,17 @@
-<?php namespace App\Routes;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Routes;
 
 use App\Commands\Middleware\CliAuthenticationMiddleware;
 use App\Container\CliCommandsConfigurator;
-use Limoncello\Application\Commands\DataCommand;
-use Limoncello\Contracts\Commands\RoutesConfiguratorInterface;
-use Limoncello\Contracts\Commands\RoutesInterface;
+use Whoa\Application\Commands\DataCommand;
+use Whoa\Contracts\Commands\RoutesConfiguratorInterface;
+use Whoa\Contracts\Commands\RoutesInterface;
 
 /**
  * @package App
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CliRoutes implements RoutesConfiguratorInterface
 {
@@ -21,7 +23,7 @@ class CliRoutes implements RoutesConfiguratorInterface
         $routes
             ->addGlobalContainerConfigurators([
                 CliCommandsConfigurator::CONFIGURATOR,
-                ])
+            ])
             ->addCommandMiddleware(DataCommand::NAME, [CliAuthenticationMiddleware::CALLABLE_HANDLER]);
     }
 }

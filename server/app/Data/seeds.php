@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Place here seeds in an order you want them to be executed.
 
 return [

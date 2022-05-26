@@ -1,4 +1,3 @@
-server/storage/local.sqlite
 .idea/
 node_modules/
 vendor/
@@ -7,3 +6,4 @@ composer.lock
 package-lock.json
 yarn.lock
 yarn-error.log
+*.phar

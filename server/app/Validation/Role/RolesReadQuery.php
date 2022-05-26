@@ -1,10 +1,16 @@
-<?php namespace App\Validation\Role;
+<?php
 
+declare(strict_types=1);
+
+namespace App\Validation\Role;
+
+use App\Json\Schemas\BaseSchema;
 use App\Json\Schemas\RoleSchema as Schema;
 use App\Validation\Role\RoleRules as r;
-use Limoncello\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
-use Limoncello\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
-use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Whoa\Flute\Contracts\Schema\SchemaInterface;
+use Whoa\Flute\Contracts\Validation\JsonApiQueryRulesInterface;
+use Whoa\Flute\Validation\JsonApi\Rules\DefaultQueryValidationRules;
+use Whoa\Validation\Contracts\Rules\RuleInterface;
 use Settings\ApplicationApi;
 
 /**
@@ -17,7 +23,7 @@ class RolesReadQuery implements JsonApiQueryRulesInterface
      */
     public static function getIdentityRule(): ?RuleInterface
     {
-        return r::asSanitizedString();
+        return r::stringToInt(r::moreThan(0));
     }
 
     /**
@@ -26,9 +32,12 @@ class RolesReadQuery implements JsonApiQueryRulesInterface
     public static function getFilterRules(): ?array
     {
         return [
-            Schema::RESOURCE_ID      => static::getIdentityRule(),
+            SchemaInterface::RESOURCE_ID => static::getIdentityRule(),
+            BaseSchema::ATTR_UUID => r::asSanitizedUuid(),
+            Schema::ATTR_NAME => r::asSanitizedString(),
             Schema::ATTR_DESCRIPTION => r::asSanitizedString(),
-            Schema::ATTR_CREATED_AT  => r::asJsonApiDateTime(),
+            BaseSchema::ATTR_CREATED_AT => r::asJsonApiDateTime(),
+            BaseSchema::ATTR_UPDATED_AT => r::asJsonApiDateTime(),
         ];
     }
 
@@ -46,10 +55,13 @@ class RolesReadQuery implements JsonApiQueryRulesInterface
      */
     public static function getSortsRule(): ?RuleInterface
     {
-        return r::isString(r::inValues([
-            Schema::RESOURCE_ID,
-            Schema::ATTR_DESCRIPTION,
-        ]));
+        return r::isString(
+            r::inValues([
+                SchemaInterface::RESOURCE_ID,
+                Schema::ATTR_NAME,
+                Schema::ATTR_DESCRIPTION,
+            ])
+        );
     }
 
     /**
@@ -57,8 +69,11 @@ class RolesReadQuery implements JsonApiQueryRulesInterface
      */
     public static function getIncludesRule(): ?RuleInterface
     {
-        // no includes are allowed
-        return r::fail();
+        return r::isString(
+            r::inValues([
+                Schema::REL_USERS,
+            ])
+        );
     }
 
     /**

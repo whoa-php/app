@@ -1,9 +1,14 @@
-<?php namespace Tests\Json;
+<?php
 
-use App\Data\Models\Role;
-use App\Data\Seeds\RolesSeed;
-use App\Json\Schemas\RoleSchema;
-use Limoncello\Testing\JsonApiCallsTrait;
+declare(strict_types=1);
+
+namespace Tests\Json;
+
+use App\Data\Models\Role as Model;
+use App\Data\Seeds\RolesSeed as Seed;
+use App\Json\Schemas\RoleSchema as Schema;
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Testing\JsonApiCallsTrait;
 use Tests\TestCase;
 
 /**
@@ -13,7 +18,7 @@ class RoleApiTest extends TestCase
 {
     use JsonApiCallsTrait;
 
-    const API_URI = '/api/v1/' . RoleSchema::TYPE;
+    public const API_URI = '/api/v1/' . Schema::TYPE;
 
     /**
      * Test Role's API.
@@ -37,14 +42,14 @@ class RoleApiTest extends TestCase
     {
         $this->setPreventCommits();
 
-        $roleId   = RolesSeed::ROLE_USER;
+        $roleId = Seed::ID_USERS;
         $response = $this->get(self::API_URI . "/$roleId", [], $this->getModeratorOAuthHeader());
         $this->assertEquals(200, $response->getStatusCode());
 
         $json = json_decode((string)$response->getBody());
         $this->assertObjectHasAttribute('data', $json);
         $this->assertEquals($roleId, $json->data->id);
-        $this->assertEquals(RoleSchema::TYPE, $json->data->type);
+        $this->assertEquals(Schema::TYPE, $json->data->type);
     }
 
     /**
@@ -54,13 +59,13 @@ class RoleApiTest extends TestCase
     {
         $this->setPreventCommits();
 
-        $roleId   = RolesSeed::ROLE_USER;
+        $roleId = Seed::ID_USERS;
         $response = $this->get(self::API_URI . "/$roleId/users", [], $this->getModeratorOAuthHeader());
         $this->assertEquals(200, $response->getStatusCode());
 
         $json = json_decode((string)$response->getBody());
         $this->assertObjectHasAttribute('data', $json);
-        $this->assertCount(4, $json->data);
+        $this->assertCount(1, $json->data);
     }
 
     /**
@@ -70,19 +75,18 @@ class RoleApiTest extends TestCase
     {
         $this->setPreventCommits();
 
-        $description = "New role";
-        $jsonInput   = <<<EOT
+        $name = "New role";
+        $jsonInput = <<<EOT
         {
             "data" : {
                 "type"  : "roles",
-                "id"    : "new_role",
                 "attributes" : {
-                    "description"  : "$description"
+                    "name"  : "$name"
                 }
             }
         }
 EOT;
-        $headers  = $this->getAdminOAuthHeader();
+        $headers = $this->getAdministratorOAuthHeader();
 
         $response = $this->postJsonApi(self::API_URI, $jsonInput, $headers);
         $this->assertEquals(201, $response->getStatusCode());
@@ -95,11 +99,11 @@ EOT;
         $this->assertEquals(200, $this->get(self::API_URI . "/$roleId", [], $headers)->getStatusCode());
 
         // ... or make same check in the database
-        $query     = $this->getCapturedConnection()->createQueryBuilder();
+        $query = $this->getCapturedConnection()->createQueryBuilder();
         $statement = $query
             ->select('*')
-            ->from(Role::TABLE_NAME)
-            ->where(Role::FIELD_ID . '=' . $query->createPositionalParameter($roleId))
+            ->from(Model::TABLE_NAME)
+            ->where(Model::FIELD_ID . '=' . $query->createPositionalParameter($roleId))
             ->execute();
         $this->assertNotEmpty($statement->fetch());
     }
@@ -111,9 +115,9 @@ EOT;
     {
         $this->setPreventCommits();
 
-        $index       = RolesSeed::ROLE_USER;
+        $index = Seed::ID_USERS;
         $description = "New description";
-        $jsonInput   = <<<EOT
+        $jsonInput = <<<EOT
         {
             "data" : {
                 "type"  : "roles",
@@ -124,7 +128,7 @@ EOT;
             }
         }
 EOT;
-        $headers  = $this->getAdminOAuthHeader();
+        $headers = $this->getAdministratorOAuthHeader();
 
         $response = $this->patchJsonApi(self::API_URI . "/$index", $jsonInput, $headers);
         $this->assertEquals(200, $response->getStatusCode());
@@ -137,14 +141,14 @@ EOT;
         $this->assertEquals(200, $this->get(self::API_URI . "/$index", [], $headers)->getStatusCode());
 
         // ... or make same check in the database
-        $query     = $this->getCapturedConnection()->createQueryBuilder();
+        $query = $this->getCapturedConnection()->createQueryBuilder();
         $statement = $query
             ->select('*')
-            ->from(Role::TABLE_NAME)
-            ->where(Role::FIELD_ID . '=' . $query->createPositionalParameter($index))
+            ->from(Model::TABLE_NAME)
+            ->where(Model::FIELD_ID . '=' . $query->createPositionalParameter($index))
             ->execute();
         $this->assertNotEmpty($values = $statement->fetch());
-        $this->assertEquals($description, $values[Role::FIELD_DESCRIPTION]);
-        $this->assertNotEmpty($values[Role::FIELD_UPDATED_AT]);
+        $this->assertEquals($description, $values[Model::FIELD_DESCRIPTION]);
+        $this->assertNotEmpty($values[TimestampFields::FIELD_UPDATED_AT]);
     }
 }

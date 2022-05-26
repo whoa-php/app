@@ -1,10 +1,14 @@
-<?php namespace App\Web\Middleware;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Web\Middleware;
 
 use Closure;
-use Limoncello\Contracts\Application\MiddlewareInterface;
-use Limoncello\Contracts\Passport\PassportAccountManagerInterface;
-use Limoncello\Passport\Exceptions\AuthenticationException;
-use Limoncello\Passport\Exceptions\RepositoryException;
+use Whoa\Contracts\Application\MiddlewareInterface;
+use Whoa\Contracts\Passport\PassportAccountManagerInterface;
+use Whoa\Passport\Exceptions\AuthenticationException;
+use Whoa\Passport\Exceptions\RepositoryException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,12 +19,12 @@ use Psr\Log\LoggerInterface;
  */
 final class CookieAuth implements MiddlewareInterface
 {
-    const COOKIE_NAME = 'auth_token';
+    public const COOKIE_NAME = 'auth_token';
 
     /**
      * Middleware handler.
      */
-    const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
+    public const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
 
     /**
      * @inheritdoc

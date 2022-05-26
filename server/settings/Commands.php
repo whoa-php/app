@@ -1,6 +1,10 @@
-<?php namespace Settings;
+<?php
 
-use Limoncello\Application\Packages\Commands\CommandSettings;
+declare(strict_types=1);
+
+namespace Settings;
+
+use Whoa\Application\Packages\Commands\CommandSettings;
 
 /**
  * @package Settings

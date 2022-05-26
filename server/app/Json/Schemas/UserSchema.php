@@ -1,47 +1,47 @@
-<?php namespace App\Json\Schemas;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Json\Schemas;
 
 use App\Data\Models\User as Model;
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Contracts\Data\UuidFields;
 
 /**
  * @package App
  */
 class UserSchema extends BaseSchema
 {
-    /** Type */
-    const TYPE = 'users';
+    /** @var string Type */
+    public const TYPE = 'users';
 
-    /** Model class name */
-    const MODEL = Model::class;
+    /** @var string Model class name */
+    public const MODEL = Model::class;
 
-    /** Attribute name */
-    const ATTR_FIRST_NAME = 'first-name';
+    /** @var string Attribute name */
+    public const ATTR_EMAIL = Model::FIELD_EMAIL;
 
-    /** Attribute name */
-    const ATTR_LAST_NAME = 'last-name';
+    /** @var string Virtual attribute name */
+    public const V_ATTR_PASSWORD = 'password';
 
-    /** Attribute name */
-    const ATTR_EMAIL = 'email';
+    /** @var string Capture name */
+    public const CAPTURE_NAME_PASSWORD = self::V_ATTR_PASSWORD;
 
-    /** Attribute name */
-    const ATTR_CREATED_AT = 'created-at';
+    /** @var string Virtual attribute name */
+    public const V_ATTR_PASSWORD_CONFIRMATION = 'password-confirmation';
 
-    /** Attribute name */
-    const ATTR_UPDATED_AT = 'updated-at';
+    /** @var string Capture name */
+    public const CAPTURE_NAME_PASSWORD_CONFIRMATION = self::V_ATTR_PASSWORD_CONFIRMATION;
 
-    /** Virtual attribute name */
-    const V_ATTR_PASSWORD = 'password';
+    /** @var string Attribute name */
+    public const ATTR_DESCRIPTION = Model::FIELD_DESCRIPTION;
 
-    /** Capture name */
-    const CAPTURE_NAME_PASSWORD = self::V_ATTR_PASSWORD;
+    /** @var string Relationship name */
+    public const REL_ROLE = Model::REL_ROLE;
 
-    /** Virtual attribute name */
-    const V_ATTR_PASSWORD_CONFIRMATION = 'password-confirmation';
-
-    /** Capture name */
-    const CAPTURE_NAME_PASSWORD_CONFIRMATION = self::V_ATTR_PASSWORD_CONFIRMATION;
-
-    /** Relationship name */
-    const REL_ROLE = 'role';
+    /** @var string Relationship name */
+    public const REL_OAUTH_TOKENS = 'oauth-tokens';
 
     /**
      * @inheritdoc
@@ -49,19 +49,19 @@ class UserSchema extends BaseSchema
     public static function getMappings(): array
     {
         return [
-            self::SCHEMA_ATTRIBUTES    => [
-                self::RESOURCE_ID     => Model::FIELD_ID,
-                self::ATTR_FIRST_NAME => Model::FIELD_FIRST_NAME,
-                self::ATTR_LAST_NAME  => Model::FIELD_LAST_NAME,
-                self::ATTR_EMAIL      => Model::FIELD_EMAIL,
-                self::ATTR_CREATED_AT => Model::FIELD_CREATED_AT,
-                self::ATTR_UPDATED_AT => Model::FIELD_UPDATED_AT,
-
-                self::V_ATTR_PASSWORD              => self::CAPTURE_NAME_PASSWORD,
+            self::SCHEMA_ATTRIBUTES => [
+                self::RESOURCE_ID => Model::FIELD_ID,
+                self::ATTR_UUID => UuidFields::FIELD_UUID,
+                self::ATTR_EMAIL => Model::FIELD_EMAIL,
+                self::V_ATTR_PASSWORD => self::CAPTURE_NAME_PASSWORD,
                 self::V_ATTR_PASSWORD_CONFIRMATION => self::CAPTURE_NAME_PASSWORD_CONFIRMATION,
+                self::ATTR_DESCRIPTION => Model::FIELD_DESCRIPTION,
+                self::ATTR_CREATED_AT => TimestampFields::FIELD_CREATED_AT,
+                self::ATTR_UPDATED_AT => TimestampFields::FIELD_UPDATED_AT,
             ],
             self::SCHEMA_RELATIONSHIPS => [
                 self::REL_ROLE => Model::REL_ROLE,
+                self::REL_OAUTH_TOKENS => Model::REL_OAUTH_TOKENS,
             ],
         ];
     }

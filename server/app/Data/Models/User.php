@@ -1,44 +1,47 @@
-<?php namespace App\Data\Models;
+<?php
 
-use Doctrine\DBAL\Types\Type;
-use Limoncello\Contracts\Application\ModelInterface;
-use Limoncello\Contracts\Data\RelationshipTypes;
-use Limoncello\Flute\Types\DateTimeType;
+declare(strict_types=1);
+
+namespace App\Data\Models;
+
+use Doctrine\DBAL\Types\Types;
+use Whoa\Contracts\Application\ModelInterface;
+use Whoa\Contracts\Data\RelationshipTypes;
+use Whoa\Doctrine\Types\DateTimeType;
+use Whoa\Doctrine\Types\UuidType;
+use Whoa\Passport\Contracts\Models\TokenModelInterface;
 
 /**
  * @package App
  */
 class User implements ModelInterface, CommonFields
 {
-    /** Table name */
-    const TABLE_NAME = 'users';
+    /** @var string Table name */
+    public const TABLE_NAME = 'users';
 
-    /** Primary key */
-    const FIELD_ID = 'id_user';
+    /** @var string Primary key */
+    public const FIELD_ID = 'id_user';
 
-    /** Primary key */
-    const FIELD_ID_ROLE = Role::FIELD_ID;
+    /** @var string Foreign key */
+    public const FIELD_ID_ROLE = Role::FIELD_ID;
 
-    /** Field name */
-    const FIELD_EMAIL = 'email';
+    /** @var string  Field name */
+    public const FIELD_EMAIL = 'email';
 
-    /** Field name */
-    const FIELD_FIRST_NAME = 'first_name';
+    /** @var string  Field name */
+    public const FIELD_PASSWORD_HASH = 'password_hash';
 
-    /** Field name */
-    const FIELD_LAST_NAME = 'last_name';
+    /** @var string  Field name */
+    public const FIELD_DESCRIPTION = 'description';
 
-    /** Field name */
-    const FIELD_PASSWORD_HASH = 'password_hash';
+    /** @var string Relationship name */
+    public const REL_ROLE = 'role';
 
-    /** Relationship name */
-    const REL_ROLE = 'role';
+    /** @var string Relationship name */
+    public const REL_OAUTH_TOKENS = 'oauth_tokens';
 
-//    /** Relationship name */
-//    const REL_POSTS = 'posts';
-
-    /** Minimum password length */
-    const MIN_PASSWORD_LENGTH = 5;
+    /** @var int Minimum password length */
+    public const MIN_PASSWORD_LENGTH = 5;
 
     /**
      * @inheritdoc
@@ -62,15 +65,15 @@ class User implements ModelInterface, CommonFields
     public static function getAttributeTypes(): array
     {
         return [
-            self::FIELD_ID            => Type::INTEGER,
-            self::FIELD_ID_ROLE       => Role::getAttributeTypes()[Role::FIELD_ID],
-            self::FIELD_FIRST_NAME    => Type::STRING,
-            self::FIELD_LAST_NAME     => Type::STRING,
-            self::FIELD_EMAIL         => Type::STRING,
-            self::FIELD_PASSWORD_HASH => Type::STRING,
-            self::FIELD_CREATED_AT    => DateTimeType::NAME,
-            self::FIELD_UPDATED_AT    => DateTimeType::NAME,
-            self::FIELD_DELETED_AT    => DateTimeType::NAME,
+            self::FIELD_ID => Types::INTEGER,
+            self::FIELD_UUID => UuidType::NAME,
+            self::FIELD_ID_ROLE => Role::getAttributeTypes()[Role::FIELD_ID],
+            self::FIELD_EMAIL => Types::STRING,
+            self::FIELD_PASSWORD_HASH => Types::STRING,
+            self::FIELD_DESCRIPTION => Types::TEXT,
+            self::FIELD_CREATED_AT => DateTimeType::NAME,
+            self::FIELD_UPDATED_AT => DateTimeType::NAME,
+            self::FIELD_DELETED_AT => DateTimeType::NAME,
         ];
     }
 
@@ -80,10 +83,7 @@ class User implements ModelInterface, CommonFields
     public static function getAttributeLengths(): array
     {
         return [
-            self::FIELD_ID_ROLE       => Role::getAttributeLengths()[Role::FIELD_ID],
-            self::FIELD_FIRST_NAME    => 100,
-            self::FIELD_LAST_NAME     => 100,
-            self::FIELD_EMAIL         => 255,
+            self::FIELD_EMAIL => 255,
             self::FIELD_PASSWORD_HASH => 100,
         ];
     }
@@ -97,17 +97,33 @@ class User implements ModelInterface, CommonFields
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function getVirtualAttributes(): array
+    {
+        return [];
+    }
+
+    /**
      * @inheritdoc
      */
     public static function getRelationships(): array
     {
         return [
             RelationshipTypes::BELONGS_TO => [
-                self::REL_ROLE => [Role::class, self::FIELD_ID_ROLE, Role::REL_USERS],
+                self::REL_ROLE => [
+                    Role::class,
+                    self::FIELD_ID_ROLE,
+                    Role::REL_USERS
+                ],
             ],
-//            RelationshipTypes::HAS_MANY   => [
-//                self::REL_POSTS => [Post::class, Post::FIELD_ID_USER, Post::REL_USER],
-//            ],
+            RelationshipTypes::HAS_MANY => [
+                self::REL_OAUTH_TOKENS => [
+                    OAuthToken::class,
+                    TokenModelInterface::FIELD_ID_USER,
+                    TokenModelInterface::REL_USER,
+                ],
+            ],
         ];
     }
 }

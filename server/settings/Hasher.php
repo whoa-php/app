@@ -1,7 +1,11 @@
-<?php namespace Settings;
+<?php
+
+declare(strict_types=1);
+
+namespace Settings;
 
 use Dotenv\Dotenv;
-use Limoncello\Crypt\Package\HasherSettings;
+use Whoa\Crypt\Package\HasherSettings;
 
 /**
  * @package Settings

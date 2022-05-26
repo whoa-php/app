@@ -1,16 +1,15 @@
-<?php namespace App\Data\Models;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Data\Models;
+
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Contracts\Data\UuidFields;
 
 /**
  * @package App
  */
-interface CommonFields
+interface CommonFields extends UuidFields, TimestampFields
 {
-    /** Field name */
-    const FIELD_CREATED_AT = 'created_at';
-
-    /** Field name */
-    const FIELD_UPDATED_AT = 'updated_at';
-
-    /** Field name */
-    const FIELD_DELETED_AT = 'deleted_at';
 }

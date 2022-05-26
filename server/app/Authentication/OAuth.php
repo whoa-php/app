@@ -1,12 +1,21 @@
-<?php namespace App\Authentication;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Authentication;
 
 use App\Api\UsersApi;
 use App\Data\Models\User;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
-use Limoncello\Crypt\Contracts\HasherInterface;
-use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Passport\Contracts\Entities\TokenInterface;
+use Doctrine\DBAL\Connection as DBALConnection;
+use Doctrine\DBAL\Driver\Exception as DBALDriverException;
+use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Contracts\Data\UuidFields;
+use Whoa\Crypt\Contracts\HasherInterface;
+use Whoa\Flute\Contracts\FactoryInterface;
+use Whoa\Passport\Contracts\Entities\TokenInterface;
 use PDO;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -28,47 +37,58 @@ final class OAuth
 
     /**
      * @param ContainerInterface $container
-     * @param string             $userName
-     * @param string             $password
+     * @param string $userName
+     * @param string|null $password
      *
      * @return int|null
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function validateUser(ContainerInterface $container, string $userName, string $password)
-    {
-        /** @var Connection $connection */
-        $connection = $container->get(Connection::class);
+    public static function validateUser(
+        ContainerInterface $container,
+        string $userName,
+        ?string $password = null
+    ): ?int {
+        try {
+            /** @var DBALConnection $connection */
+            $connection = $container->get(DBALConnection::class);
+            $query = $connection->createQueryBuilder();
+            $query
+                ->select([User::FIELD_ID, User::FIELD_EMAIL, User::FIELD_PASSWORD_HASH])
+                ->from(User::TABLE_NAME)
+                ->where($query->expr()->eq(User::FIELD_EMAIL, $query->createPositionalParameter($userName)))
+                ->setMaxResults(1);
 
-        $query = $connection->createQueryBuilder();
-        $query
-            ->select([User::FIELD_ID, User::FIELD_EMAIL, User::FIELD_PASSWORD_HASH])
-            ->from(User::TABLE_NAME)
-            ->where(User::FIELD_EMAIL . '=' . $query->createPositionalParameter($userName))
-            ->setMaxResults(1);
-        $user = $query->execute()->fetch(PDO::FETCH_ASSOC);
-        if ($user === false) {
+            $user = $query->execute()->fetchAssociative();
+            if ($user === false) {
+                return null;
+            }
+
+            if (isset($password) === true) {
+                /** @var HasherInterface $hasher */
+                $hasher = $container->get(HasherInterface::class);
+                if ($hasher->verify($password, $user[User::FIELD_PASSWORD_HASH]) === false) {
+                    return null;
+                }
+            }
+
+            return (int)$user[User::FIELD_ID];
+        } catch (DBALDriverException|DBALException $exception) {
             return null;
         }
-
-        /** @var HasherInterface $hasher */
-        $hasher = $container->get(HasherInterface::class);
-        if ($hasher->verify($password, $user[User::FIELD_PASSWORD_HASH]) === false) {
-            return null;
-        }
-
-        return (int)$user[User::FIELD_ID];
     }
 
     /**
      * @param ContainerInterface $container
-     * @param int                $userId
-     * @param array|null         $scope
+     * @param int $userId
+     * @param array|null $scope
      *
      * @return null|array
      *
      * @throws ContainerExceptionInterface
+     * @throws DBALDriverException
+     * @throws DBALException
      * @throws NotFoundExceptionInterface
      */
     public static function validateScope(ContainerInterface $container, int $userId, array $scope = null): ?array
@@ -87,10 +107,10 @@ final class OAuth
         if ($scope !== null) {
             /** @var UsersApi $usersApi */
             /** @var FactoryInterface $factory */
-            $factory  = $container->get(FactoryInterface::class);
+            $factory = $container->get(FactoryInterface::class);
             $usersApi = $factory->createApi(UsersApi::class);
 
-            $userScopes    = $usersApi->noAuthReadScopes($userId);
+            $userScopes = $usersApi->noAuthReadScopes($userId);
             $adjustedScope = array_intersect($userScopes, $scope);
             if (count($adjustedScope) !== count($scope)) {
                 $result = $adjustedScope;
@@ -102,36 +122,37 @@ final class OAuth
 
     /**
      * @param ContainerInterface $container
-     * @param TokenInterface     $token
+     * @param TokenInterface $token
      *
      * @return array
      *
      * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws DBALDriverException
      * @throws DBALException
+     * @throws NotFoundExceptionInterface
      */
     public static function getTokenCustomProperties(ContainerInterface $container, TokenInterface $token): array
     {
-        $userId = $token->getUserIdentifier();
+        $userId = (string)$token->getUserIdentifier();
 
-        /** @var FactoryInterface $factory */
-        $factory = $container->get(FactoryInterface::class);
-        /** @var UsersApi $usersApi */
-        $usersApi = $factory->createApi(UsersApi::class);
+        /** @var DBALConnection $connection */
+        /** @var DBALQueryBuilder $query */
+        $connection = $container->get(DBALConnection::class);
+        $query = $connection->createQueryBuilder();
+        $users = 'u';
+        $uUserId = User::FIELD_ID;
+        $query
+            ->select([
+                $users . '.' . UuidFields::FIELD_UUID . ' AS `' . User::FIELD_ID . '`',
+                $users . '.' . User::FIELD_EMAIL,
+            ])
+            ->from(User::TABLE_NAME, $users)
+            ->where(
+                $users . '.' . User::FIELD_ID . '=' . $query->createPositionalParameter($userId, ParameterType::STRING)
+            )
+            ->orderBy($users . '.' . TimestampFields::FIELD_CREATED_AT, 'DESC')
+            ->setMaxResults(1);
 
-        $builder = $usersApi->shouldBeUntyped()->withIndexFilter($userId)->createIndexBuilder([
-            User::FIELD_EMAIL,
-            User::FIELD_FIRST_NAME,
-            User::FIELD_LAST_NAME,
-        ]);
-
-        $user = $usersApi->fetchRow($builder, User::class);
-
-        return [
-            User::FIELD_ID         => $userId,
-            User::FIELD_EMAIL      => $user[User::FIELD_EMAIL],
-            User::FIELD_FIRST_NAME => $user[User::FIELD_FIRST_NAME],
-            User::FIELD_LAST_NAME  => $user[User::FIELD_LAST_NAME],
-        ];
+        return $query->execute()->fetchAssociative();
     }
 }

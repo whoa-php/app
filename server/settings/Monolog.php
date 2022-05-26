@@ -1,6 +1,10 @@
-<?php namespace Settings;
+<?php
 
-use Limoncello\Application\Packages\Monolog\MonologFileSettings;
+declare(strict_types=1);
+
+namespace Settings;
+
+use Whoa\Application\Packages\Monolog\MonologFileSettings;
 
 /**
  * @package Settings

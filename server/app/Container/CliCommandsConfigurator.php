@@ -1,9 +1,13 @@
-<?php namespace App\Container;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Container;
 
 use Faker\Factory;
 use Faker\Generator;
-use Limoncello\Contracts\Commands\ContainerConfiguratorInterface;
-use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInterface;
+use Whoa\Contracts\Commands\ContainerConfiguratorInterface;
+use Whoa\Contracts\Container\ContainerInterface as WhoaContainerInterface;
 
 /**
  * @package Settings
@@ -11,12 +15,12 @@ use Limoncello\Contracts\Container\ContainerInterface as LimoncelloContainerInte
 class CliCommandsConfigurator implements ContainerConfiguratorInterface
 {
     /** @var callable */
-    const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
+    public const CONFIGURATOR = [self::class, self::CONTAINER_METHOD_NAME];
 
     /**
      * @inheritdoc
      */
-    public static function configureContainer(LimoncelloContainerInterface $container): void
+    public static function configureContainer(WhoaContainerInterface $container): void
     {
         $container[Generator::class] = function () {
             return Factory::create(Factory::DEFAULT_LOCALE);

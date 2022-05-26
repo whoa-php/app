@@ -1,6 +1,10 @@
-<?php namespace Settings;
+<?php
 
-use Limoncello\Application\Packages\L10n\L10nSettings;
+declare(strict_types=1);
+
+namespace Settings;
+
+use Whoa\Application\Packages\L10n\L10nSettings;
 
 /**
  * @package Settings

@@ -1,73 +1,83 @@
-<?php namespace Tests;
+<?php
+
+declare(strict_types=1);
+
+namespace Tests;
 
 use App\Application;
 use Closure;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ConnectionException;
-use Limoncello\Application\Contracts\Cookie\CookieFunctionsInterface;
-use Limoncello\Application\Contracts\Csrf\CsrfTokenStorageInterface;
-use Limoncello\Application\Contracts\Session\SessionFunctionsInterface;
-use Limoncello\Common\Reflection\ClassIsTrait;
-use Limoncello\Contracts\Container\ContainerInterface;
-use Limoncello\Contracts\Core\ApplicationInterface;
-use Limoncello\Flute\Contracts\Api\CrudInterface;
-use Limoncello\Flute\Contracts\FactoryInterface;
-use Limoncello\Testing\ApplicationWrapperInterface;
-use Limoncello\Testing\ApplicationWrapperTrait;
-use Limoncello\Testing\HttpCallsTrait;
-use Limoncello\Testing\MeasureExecutionTimeTrait;
-use Limoncello\Testing\Sapi;
-use Limoncello\Testing\TestCaseTrait;
+use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Whoa\Application\Contracts\Cookie\CookieFunctionsInterface;
+use Whoa\Application\Contracts\Csrf\CsrfTokenStorageInterface;
+use Whoa\Application\Contracts\Session\SessionFunctionsInterface;
+use Whoa\Common\Reflection\ClassIsTrait;
+use Whoa\Contracts\Container\ContainerInterface;
+use Whoa\Contracts\Core\ApplicationInterface;
+use Whoa\Flute\Contracts\Api\CrudInterface;
+use Whoa\Flute\Contracts\FactoryInterface;
+use Whoa\Testing\ApplicationWrapperInterface;
+use Whoa\Testing\ApplicationWrapperTrait;
+use Whoa\Testing\HttpCallsTrait;
+use Whoa\Testing\MeasureExecutionTimeTrait;
+use Whoa\Testing\Sapi;
+use Whoa\Testing\TestCaseTrait;
 use LogicException;
 use Mockery;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
-use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
 
 /**
  * @package Tests
  */
 class TestCase extends \PHPUnit\Framework\TestCase
 {
-    use TestCaseTrait, HttpCallsTrait, MeasureExecutionTimeTrait, OAuthSignInTrait, ClassIsTrait;
+    use ClassIsTrait;
+    use HttpCallsTrait;
+    use MeasureExecutionTimeTrait;
+    use OAuthSignInTrait;
+    use TestCaseTrait;
 
     /** @var bool */
-    private $shouldPreventCommits = false;
+    private bool $shouldPreventCommits = false;
 
     /** @var bool */
-    private $isInTransaction = false;
+    private bool $isInTransaction = false;
 
     /**
      * Database connection shared during test when commit prevention is requested.
      *
      * @var Connection|null
      */
-    private $sharedConnection = null;
+    private ?Connection $sharedConnection = null;
 
     /**
      * Next call replacements in the application container.
      *
      * @var array
      */
-    private $containerToReplace = [];
+    private array $containerToReplace = [];
 
     /**
      * Next call captures from the application container.
      *
      * @var array
      */
-    private $containerToCapture = [];
+    private array $containerToCapture = [];
 
     /**
      * Captured from container on previous application call.
      *
      * @var array
      */
-    private $containerCaptured = [];
+    private array $containerCaptured = [];
 
     /**
      * @var Closure[]
      */
-    private $containerModifiers = [];
+    private array $containerModifiers = [];
 
     /**
      * @inheritdoc
@@ -79,9 +89,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->resetEventHandlers();
 
         // keep database connection between multiple App call during a single test
-        $this->sharedConnection     = null;
+        $this->sharedConnection = null;
         $this->shouldPreventCommits = false;
-        $interceptConnection        = function (ApplicationInterface $app, ContainerInterface $container) {
+        $interceptConnection = function (ApplicationInterface $app, ContainerInterface $container) {
             assert($app);
             if ($this->shouldPreventCommits === false) {
                 // just capture connection from the call / typically is captured before test starts
@@ -113,10 +123,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
                 $functions
                     ->setStartCallable($doNothing)
                     ->setWriteCloseCallable($doNothing)
-                    ->setHasCallable(function ($key) use (&$sessionValues) : bool {
+                    ->setHasCallable(function ($key) use (&$sessionValues): bool {
                         return array_key_exists($key, $sessionValues);
                     })
-                    ->setPutCallable(function ($key, $value) use (&$sessionValues) : void {
+                    ->setPutCallable(function ($key, $value) use (&$sessionValues): void {
                         $sessionValues[$key] = $value;
                     })
                     ->setRetrieveCallable(function ($key) use (&$sessionValues) {
@@ -180,9 +190,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
         ) {
             $this->sharedConnection->rollBack();
         }
-        $this->sharedConnection     = null;
+        $this->sharedConnection = null;
         $this->shouldPreventCommits = false;
-        $this->isInTransaction      = false;
+        $this->isInTransaction = false;
         $this->resetEventHandlers();
         $this->clearContainerModifiers();
         $this->clearToCapture()->clearCaptured()->clearToReplace();
@@ -201,7 +211,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Returns database connection used used by application within current test.
+     * Returns database connection used by application within current test.
      *
      * @return Connection
      */
@@ -215,8 +225,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected function createApplication(): ApplicationInterface
     {
-        $wrapper = new class extends Application implements ApplicationWrapperInterface
-        {
+        $wrapper = new class extends Application implements ApplicationWrapperInterface {
             use ApplicationWrapperTrait;
         };
 
@@ -274,7 +283,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string         $interface
+     * @param string $interface
      * @param callable|mixed $value
      *
      * @return TestCase
@@ -316,9 +325,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
             );
         }
 
-        $value = $this->containerCaptured[$interface];
-
-        return $value;
+        return $this->containerCaptured[$interface];
     }
 
     /**
@@ -332,10 +339,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return self
      */
-    protected function setAdmin(): self
+    protected function setAdministrator(): self
     {
         return $this->addNextCallContainerModifier(
-            $this->createSetUserClosureWithCredentials($this->getAdminEmail(), $this->getAdminPassword())
+            $this->createSetUserClosureWithCredentials(
+                $this->getAdministratorEmail(),
+                $this->getAdministratorPassword()
+            )
         );
     }
 
@@ -372,16 +382,21 @@ class TestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string                $apiClass
-     * @param PsrContainerInterface $container
+     * @param string $apiClass
+     * @param PsrContainerInterface|null $container
      *
      * @return CrudInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function createApi(string $apiClass, PsrContainerInterface $container = null): CrudInterface
     {
-        assert($this->classImplements(
-            $apiClass,
-            CrudInterface::class), "Class `$apiClass` does not look like a valid API CRUD class."
+        assert(
+            $this->classImplements(
+                $apiClass,
+                CrudInterface::class
+            ),
+            "Class `$apiClass` does not look like a valid API CRUD class."
         );
 
         if ($container === null) {
@@ -390,9 +405,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         /** @var FactoryInterface $factory */
         $factory = $container->get(FactoryInterface::class);
-        $api     = $factory->createApi($apiClass);
-
-        return $api;
+        return $factory->createApi($apiClass);
     }
 
     /**
@@ -443,7 +456,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $interface
-     * @param mixed  $value
+     * @param mixed $value
      */
     private function rememberCaptured(string $interface, $value): void
     {

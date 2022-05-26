@@ -1,8 +1,12 @@
-<?php namespace App\Authorization;
+<?php
 
-use Limoncello\Application\Authorization\AuthorizationRulesTrait;
-use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
-use Limoncello\Contracts\Passport\PassportAccountInterface;
+declare(strict_types=1);
+
+namespace App\Authorization;
+
+use Whoa\Application\Authorization\AuthorizationRulesTrait;
+use Whoa\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
+use Whoa\Contracts\Passport\PassportAccountInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -15,7 +19,7 @@ trait RulesTrait
 
     /**
      * @param ContextInterface $context
-     * @param string           $scope
+     * @param string $scope
      *
      * @return bool
      *
@@ -29,7 +33,7 @@ trait RulesTrait
         if (static::ctxHasCurrentAccount($context) === true) {
             /** @var PassportAccountInterface $account */
             $account = self::ctxGetCurrentAccount($context);
-            $result  = $account->hasScope($scope);
+            $result = $account->hasScope($scope);
         }
 
         return $result;

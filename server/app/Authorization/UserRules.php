@@ -1,9 +1,13 @@
-<?php namespace App\Authorization;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Authorization;
 
 use App\Data\Seeds\PassportSeed;
 use App\Json\Schemas\UserSchema as Schema;
-use Limoncello\Application\Contracts\Authorization\ResourceAuthorizationRulesInterface;
-use Limoncello\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
+use Whoa\Application\Contracts\Authorization\ResourceAuthorizationRulesInterface;
+use Whoa\Auth\Contracts\Authorization\PolicyInformation\ContextInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -14,11 +18,20 @@ class UserRules implements ResourceAuthorizationRulesInterface
 {
     use RulesTrait;
 
-    /** Action name */
-    const ACTION_VIEW_USERS = 'canViewUsers';
+    /** @var string Action name */
+    public const ACTION_VIEW_USERS = 'canViewUsers';
 
-    /** Action name */
-    const ACTION_MANAGE_USERS = 'canManageUsers';
+    /** @var string Action name */
+    public const ACTION_CREATE_USER = 'canCreateUser';
+
+    /** @var string Action name */
+    public const ACTION_EDIT_USER = 'canEditUser';
+
+    /** @var string Action name */
+    public const ACTION_VIEW_ROLE = 'canViewRole';
+
+    /** @var string Action name */
+    public const ACTION_VIEW_OAUTH_TOKENS = 'canViewOAuthTokens';
 
     /**
      * @inheritdoc
@@ -38,7 +51,7 @@ class UserRules implements ResourceAuthorizationRulesInterface
      */
     public static function canViewUsers(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_VIEW_USERS);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_VIEW_USERS);
     }
 
     /**
@@ -49,8 +62,46 @@ class UserRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canManageUsers(ContextInterface $context): bool
+    public static function canCreateUser(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_ADMIN_USERS);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_USERS);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canEditUser(ContextInterface $context): bool
+    {
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_USERS);
+    }
+
+    /**
+     * @param ContextInterface $context
+     *
+     * @return bool
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canViewRole(ContextInterface $context): bool
+    {
+        return RoleRules::canViewRoles($context) === true &&
+            self::canViewUsers($context) === true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canViewOAuthTokens(ContextInterface $context): bool
+    {
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_OAUTH);
     }
 }

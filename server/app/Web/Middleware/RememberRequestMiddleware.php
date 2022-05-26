@@ -1,8 +1,12 @@
-<?php namespace App\Web\Middleware;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Web\Middleware;
 
 use Closure;
-use Limoncello\Contracts\Application\MiddlewareInterface;
-use Limoncello\Contracts\Http\RequestStorageInterface;
+use Whoa\Contracts\Application\MiddlewareInterface;
+use Whoa\Contracts\Http\RequestStorageInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,7 +19,7 @@ class RememberRequestMiddleware implements MiddlewareInterface
     /**
      * Middleware handler.
      */
-    const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
+    public const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
 
     /**
      * @inheritdoc

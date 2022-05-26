@@ -1,10 +1,16 @@
-<?php namespace App\Data\Seeds;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Data\Seeds;
 
 use App\Data\Models\Role as Model;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Exception;
-use Limoncello\Contracts\Data\SeedInterface;
-use Limoncello\Data\Seeds\SeedTrait;
+use Whoa\Contracts\Data\SeedInterface;
+use Whoa\Contracts\Data\TimestampFields;
+use Whoa\Contracts\Data\UuidFields;
+use Whoa\Data\Seeds\SeedTrait;
 
 /**
  * @package App
@@ -13,14 +19,20 @@ class RolesSeed implements SeedInterface
 {
     use SeedTrait;
 
-    /** Role name */
-    const ROLE_ADMIN = 'admin';
+    /** @var int Field value */
+    public const ID_ADMINISTRATORS = 1;
+    /** @var string Field value */
+    public const NAME_ADMINISTRATORS = 'Administrators';
 
-    /** Role name */
-    const ROLE_MODERATOR = 'moderator';
+    /** @var int Field value */
+    public const ID_MODERATORS = 2;
+    /** @var string Field value */
+    public const NAME_MODERATORS = 'Moderators';
 
-    /** Role name */
-    const ROLE_USER = 'user';
+    /** @var int Field value */
+    public const ID_USERS = 3;
+    /** @var string Field value */
+    public const NAME_USERS = 'Users';
 
     /**
      * @inheritdoc
@@ -30,21 +42,25 @@ class RolesSeed implements SeedInterface
      */
     public function run(): void
     {
-        $now = $this->now();
-        $this->seedRowData(Model::TABLE_NAME, [
-            Model::FIELD_ID          => self::ROLE_ADMIN,
-            Model::FIELD_DESCRIPTION => 'Administrator',
-            Model::FIELD_CREATED_AT  => $now,
+        $this->seedModelData(Model::class, [
+            Model::FIELD_ID => self::ID_ADMINISTRATORS,
+            UuidFields::FIELD_UUID => $this->uuid(),
+            Model::FIELD_NAME => self::NAME_ADMINISTRATORS,
+            TimestampFields::FIELD_CREATED_AT => $this->now(),
         ]);
-        $this->seedRowData(Model::TABLE_NAME, [
-            Model::FIELD_ID          => self::ROLE_MODERATOR,
-            Model::FIELD_DESCRIPTION => 'Moderator',
-            Model::FIELD_CREATED_AT  => $now,
+
+        $this->seedModelData(Model::class, [
+            Model::FIELD_ID => self::ID_MODERATORS,
+            UuidFields::FIELD_UUID => $this->uuid(),
+            Model::FIELD_NAME => self::NAME_MODERATORS,
+            TimestampFields::FIELD_CREATED_AT => $this->now(),
         ]);
-        $this->seedRowData(Model::TABLE_NAME, [
-            Model::FIELD_ID          => self::ROLE_USER,
-            Model::FIELD_DESCRIPTION => 'User',
-            Model::FIELD_CREATED_AT  => $now,
+
+        $this->seedModelData(Model::class, [
+            Model::FIELD_ID => self::ID_USERS,
+            UuidFields::FIELD_UUID => $this->uuid(),
+            Model::FIELD_NAME => self::NAME_USERS,
+            TimestampFields::FIELD_CREATED_AT => $this->now(),
         ]);
     }
 }

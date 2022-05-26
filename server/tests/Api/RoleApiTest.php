@@ -1,7 +1,13 @@
-<?php namespace Tests\Api;
+<?php
 
-use App\Api\RolesApi;
-use App\Data\Seeds\RolesSeed;
+declare(strict_types=1);
+
+namespace Tests\Api;
+
+use App\Api\RolesApi as Api;
+use App\Data\Seeds\RolesSeed as Seed;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 
 /**
@@ -11,32 +17,36 @@ class RoleApiTest extends TestCase
 {
     /**
      * Shows usage of low level API in tests.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testLowLevelApiRead(): void
     {
         $this->setPreventCommits();
 
         $this->setModerator();
-        $api = $this->createApi(RolesApi::class);
+        $api = $this->createApi(Api::class);
 
-        $roleId = RolesSeed::ROLE_USER;
-        $this->assertNotNull($api->read($roleId));
+        $roleId = Seed::ID_USERS;
+        $this->assertNotNull($api->read((string)$roleId));
     }
 
     /**
      * Same test but with auth by a OAuth token.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function testLowLevelApiReadWithAuthByToken(): void
     {
         $this->setPreventCommits();
 
-        $oauthToken  = $this->getModeratorOAuthToken();
+        $oauthToken = $this->getModeratorOAuthToken();
         $accessToken = $oauthToken->access_token;
         $this->setUserByToken($accessToken);
 
-        $api = $this->createApi(RolesApi::class);
+        $api = $this->createApi(Api::class);
 
-        $roleId = RolesSeed::ROLE_USER;
-        $this->assertNotNull($api->read($roleId));
+        $roleId = Seed::ID_USERS;
+        $this->assertNotNull($api->read((string)$roleId));
     }
 }

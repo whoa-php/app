@@ -1,14 +1,16 @@
-<?php namespace App\Validation\User;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Validation\User;
 
 use App\Json\Schemas\UserSchema as Schema;
 use App\Validation\User\UserRules as r;
-use Limoncello\Flute\Contracts\Validation\JsonApiDataRulesInterface;
-use Limoncello\Validation\Contracts\Rules\RuleInterface;
+use Whoa\Flute\Contracts\Validation\JsonApiDataRulesInterface;
+use Whoa\Validation\Contracts\Rules\RuleInterface;
 
 /**
  * @package App
- *
- * @SuppressWarnings(PHPMD.StaticAccess)
  */
 final class UserUpdateJson implements JsonApiDataRulesInterface
 {
@@ -17,7 +19,7 @@ final class UserUpdateJson implements JsonApiDataRulesInterface
      */
     public static function getTypeRule(): RuleInterface
     {
-        return r::userType();
+        return r::schemaType();
     }
 
     /**
@@ -34,10 +36,9 @@ final class UserUpdateJson implements JsonApiDataRulesInterface
     public static function getAttributeRules(): array
     {
         return [
-            Schema::ATTR_FIRST_NAME => r::firstName(),
-            Schema::ATTR_LAST_NAME  => r::lastName(),
-            Schema::ATTR_EMAIL      => r::uniqueEmail(),
+            Schema::ATTR_EMAIL => r::email(true),
             Schema::V_ATTR_PASSWORD => r::password(),
+            Schema::ATTR_DESCRIPTION => r::asSanitizedString(),
         ];
     }
 

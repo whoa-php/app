@@ -1,11 +1,15 @@
-<?php namespace App\Web\Middleware;
+<?php
+
+declare(strict_types=1);
+
+namespace App\Web\Middleware;
 
 use App\Web\Controllers\ControllerTrait;
 use App\Web\Views;
 use Closure;
-use Limoncello\Contracts\Application\MiddlewareInterface;
-use Limoncello\Contracts\Exceptions\AuthorizationExceptionInterface;
-use Limoncello\Contracts\Http\ThrowableResponseInterface;
+use Whoa\Contracts\Application\MiddlewareInterface;
+use Whoa\Contracts\Exceptions\AuthorizationExceptionInterface;
+use Whoa\Contracts\Http\ThrowableResponseInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -23,7 +27,7 @@ class CustomErrorResponsesMiddleware implements MiddlewareInterface
     /**
      * Middleware handler.
      */
-    const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
+    public const CALLABLE_HANDLER = [self::class, self::MIDDLEWARE_METHOD_NAME];
 
     /**
      * @inheritdoc
@@ -54,8 +58,8 @@ class CustomErrorResponsesMiddleware implements MiddlewareInterface
 
     /**
      * @param ContainerInterface $container
-     * @param int                $templateId
-     * @param int                $httpCode
+     * @param int $templateId
+     * @param int $httpCode
      *
      * @return ResponseInterface
      *

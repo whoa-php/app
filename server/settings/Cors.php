@@ -1,7 +1,11 @@
-<?php namespace Settings;
+<?php
+
+declare(strict_types=1);
+
+namespace Settings;
 
 use Dotenv\Dotenv;
-use Limoncello\Application\Packages\Cors\CorsSettings;
+use Whoa\Application\Packages\Cors\CorsSettings;
 
 /**
  * @package Settings

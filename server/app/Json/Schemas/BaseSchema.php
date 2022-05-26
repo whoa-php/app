@@ -1,8 +1,12 @@
-<?php namespace App\Json\Schemas;
+<?php
 
-use Limoncello\Common\Reflection\ClassIsTrait;
-use Limoncello\Contracts\Application\ModelInterface;
-use Limoncello\Flute\Schema\Schema;
+declare(strict_types=1);
+
+namespace App\Json\Schemas;
+
+use Whoa\Common\Reflection\ClassIsTrait;
+use Whoa\Contracts\Application\ModelInterface;
+use Whoa\Flute\Schema\Schema;
 
 /**
  * @package App
@@ -11,19 +15,20 @@ abstract class BaseSchema extends Schema
 {
     use ClassIsTrait;
 
-    /** Attribute name */
-    const ATTR_CREATED_AT = 'created-at';
+    /** @var string Attribute name */
+    public const ATTR_UUID = 'uuid';
 
-    /** Attribute name */
-    const ATTR_UPDATED_AT = 'updated-at';
+    /** @var string Attribute name */
+    public const ATTR_CREATED_AT = 'created-at';
 
-    /** Attribute name */
-    const ATTR_DELETED_AT = 'deleted-at';
+    /** @var string Attribute name */
+    public const ATTR_UPDATED_AT = 'updated-at';
+
+    /** @var string Attribute name */
+    public const ATTR_DELETED_AT = 'deleted-at';
 
     /**
      * @inheritdoc
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     public function getId($resource): ?string
     {
@@ -35,6 +40,6 @@ abstract class BaseSchema extends Schema
 
         $pkName = $modelClass::getPrimaryKeyName();
 
-        return $resource->{$pkName};
+        return (string)$resource->{$pkName};
     }
 }

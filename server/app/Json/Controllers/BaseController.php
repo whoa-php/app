@@ -1,11 +1,13 @@
-<?php namespace App\Json\Controllers;
+<?php
 
-use Limoncello\Flute\Http\JsonApiBaseController;
+declare(strict_types=1);
+
+namespace App\Json\Controllers;
+
+use Whoa\Flute\Http\JsonApiBaseController;
 
 /**
  * @package App
- *
- * @SuppressWarnings(PHPMD.StaticAccess)
  */
 abstract class BaseController extends JsonApiBaseController
 {
