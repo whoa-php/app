@@ -21,6 +21,7 @@ declare(strict_types=1);
 
 namespace Settings;
 
+use App\AzureClient\AzureClientProvider;
 use Dotenv\Dotenv;
 use Whoa\Application\Packages\Application\ApplicationProvider;
 use Whoa\Application\Packages\Authorization\AuthorizationProvider;
@@ -102,6 +103,7 @@ class Application implements ApplicationConfigurationInterface
                 FluteProvider::class,
                 PassportProvider::class,
                 TwigTemplatesProvider::class,
+                AzureClientProvider::class,
             ],
         ];
     }
