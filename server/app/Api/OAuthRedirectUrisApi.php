@@ -1,11 +1,26 @@
 <?php
 
+/**
+ * Copyright 2021-2022 info@whoaphp.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace App\Api;
 
 use App\Authorization\OAuthRedirectUriRules as Rules;
-use App\Data\Models\OAuthRedirectUri;
 use App\Data\Models\OAuthRedirectUri as Model;
 use App\Json\Schemas\OAuthRedirectUriSchema as Schema;
 use Psr\Container\ContainerExceptionInterface;
@@ -13,7 +28,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Whoa\Contracts\Exceptions\AuthorizationExceptionInterface;
 use Whoa\Flute\Contracts\Models\PaginatedDataInterface;
-use Whoa\Passport\Contracts\Models\RedirectUriInterface as ModelInterface;
+use Whoa\Passport\Contracts\Models\RedirectUriModelInterface as ModelInterface;
 
 /**
  * @package App
@@ -30,7 +45,6 @@ class OAuthRedirectUrisApi extends BaseApi
 
     /**
      * @inheritdoc
-     *
      * @param string|null $index
      * @param iterable $attributes
      * @param iterable $toMany
@@ -48,7 +62,6 @@ class OAuthRedirectUrisApi extends BaseApi
 
     /**
      * @inheritdoc
-     *
      * @param string $index
      * @param iterable $attributes
      * @param iterable $toMany
@@ -66,7 +79,6 @@ class OAuthRedirectUrisApi extends BaseApi
 
     /**
      * @inheritdoc
-     *
      * @param string $index
      * @return bool
      * @throws AuthorizationExceptionInterface
@@ -82,7 +94,6 @@ class OAuthRedirectUrisApi extends BaseApi
 
     /**
      * @inheritdoc
-     *
      * @return PaginatedDataInterface
      * @throws AuthorizationExceptionInterface
      * @throws ContainerExceptionInterface
@@ -97,7 +108,6 @@ class OAuthRedirectUrisApi extends BaseApi
 
     /**
      * @inheritdoc
-     *
      * @param string $index
      * @return mixed|null
      * @throws AuthorizationExceptionInterface
@@ -115,9 +125,7 @@ class OAuthRedirectUrisApi extends BaseApi
      * @param string|int $index
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
-     *
      * @return PaginatedDataInterface
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws AuthorizationExceptionInterface

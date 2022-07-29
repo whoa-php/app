@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Copyright 2015-2019 info@neomerx.com
+ * Modification Copyright 2021-2022 info@whoaphp.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace Tests;
@@ -177,7 +194,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @inheritdoc
-     *
      * @throws ConnectionException
      */
     protected function tearDown()
@@ -202,7 +218,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Prevent commits to database within current test.
-     *
      * @return void
      */
     protected function setPreventCommits()
@@ -212,7 +227,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Returns database connection used by application within current test.
-     *
      * @return Connection
      */
     protected function getCapturedConnection(): ?Connection
@@ -263,10 +277,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         /** @var EmitterInterface $emitter */
         $emitter = Mockery::mock(EmitterInterface::class);
 
-        $sapi
-            = new Sapi($emitter, $server, $queryParams, $parsedBody, $cookies, $files, $messageBody, $protocolVersion);
-
-        return $sapi;
+        return new Sapi($emitter, $server, $queryParams, $parsedBody, $cookies, $files, $messageBody, $protocolVersion);
     }
 
     /**
@@ -285,7 +296,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param string $interface
      * @param callable|mixed $value
-     *
      * @return TestCase
      */
     protected function replaceInNextAppCall(string $interface, $value): self
@@ -299,7 +309,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $interface
-     *
      * @return TestCase
      */
     protected function captureFromNextAppCall(string $interface): self
@@ -313,7 +322,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $interface
-     *
      * @return mixed
      */
     protected function getCapturedFromPreviousAppCall(string $interface)
@@ -371,7 +379,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $accessToken
-     *
      * @return self
      */
     protected function setUserByToken(string $accessToken): self
@@ -384,7 +391,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param string $apiClass
      * @param PsrContainerInterface|null $container
-     *
      * @return CrudInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -485,7 +491,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * @param Closure $modifier
-     *
      * @return TestCase
      */
     protected function addNextCallContainerModifier(Closure $modifier): self

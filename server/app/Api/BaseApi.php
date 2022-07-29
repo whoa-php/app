@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Copyright 2015-2019 info@neomerx.com
+ * Modification Copyright 2021-2022 info@whoaphp.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 declare(strict_types=1);
 
 namespace App\Api;
@@ -24,7 +41,6 @@ use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @package App
- *
  * Here you can put common CRUD code.
  */
 abstract class BaseApi extends Crud
@@ -32,11 +48,10 @@ abstract class BaseApi extends Crud
     use UuidTypeTrait;
 
     /**
-     * @param               $index
+     * @param $index
      * @param string $name
      * @param iterable|null $relationshipFilters
      * @param iterable|null $relationshipSorts
-     *
      * @return PaginatedDataInterface
      */
     protected function readRelationshipInt(
@@ -50,13 +65,10 @@ abstract class BaseApi extends Crud
 
     /**
      * Authorize action for current user.
-     *
      * @param string $action
      * @param string|null $resourceType
      * @param string|int|null $resourceIdentity
-     *
      * @return void
-     *
      * @throws AuthorizationExceptionInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -70,7 +82,6 @@ abstract class BaseApi extends Crud
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
      */
     protected function builderSaveResourceOnCreate(ModelQueryBuilder $builder): ModelQueryBuilder
@@ -81,7 +92,6 @@ abstract class BaseApi extends Crud
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
      */
     protected function builderSaveResourceOnUpdate(ModelQueryBuilder $builder): ModelQueryBuilder
@@ -91,7 +101,6 @@ abstract class BaseApi extends Crud
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
      */
     protected function builderSaveRelationshipOnCreate($relationshipName, ModelQueryBuilder $builder): ModelQueryBuilder
@@ -101,7 +110,6 @@ abstract class BaseApi extends Crud
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
      */
     protected function builderSaveRelationshipOnUpdate($relationshipName, ModelQueryBuilder $builder): ModelQueryBuilder
@@ -111,9 +119,7 @@ abstract class BaseApi extends Crud
 
     /**
      * @param ModelQueryBuilder $builder
-     *
      * @return ModelQueryBuilder
-     *
      * @throws DBALException
      * @throws Exception
      */
@@ -128,9 +134,7 @@ abstract class BaseApi extends Crud
 
     /**
      * @param ModelQueryBuilder $builder
-     *
      * @return ModelQueryBuilder
-     *
      * @throws DBALException
      * @throws Exception
      */
@@ -157,9 +161,7 @@ abstract class BaseApi extends Crud
     /**
      * @param QueryBuilder $builder
      * @param DateTimeInterface $dateTime
-     *
      * @return string
-     *
      * @throws DBALException
      */
     protected function convertDateTimeToDbValue(QueryBuilder $builder, DateTimeInterface $dateTime): string
@@ -170,9 +172,7 @@ abstract class BaseApi extends Crud
 
     /**
      * The method assumes an account is signed in and therefore has less checks.
-     *
      * @return int|string|null
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
@@ -188,7 +188,6 @@ abstract class BaseApi extends Crud
     /**
      * @param iterable $first
      * @param iterable $second
-     *
      * @return iterable
      */
     protected function addIterable(iterable $first, iterable $second): iterable

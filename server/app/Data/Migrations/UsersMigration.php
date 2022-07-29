@@ -21,7 +21,9 @@ declare(strict_types=1);
 namespace App\Data\Migrations;
 
 use App\Data\Models\User as Model;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Whoa\Contracts\Data\MigrationInterface;
 use Whoa\Contracts\Data\UuidFields;
 use Whoa\Data\Migrations\MigrationTrait;
@@ -36,8 +38,9 @@ class UsersMigration implements MigrationInterface
 
     /**
      * @inheritdoc
-     *
      * @throws DBALException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function migrate(): void
     {
@@ -57,6 +60,8 @@ class UsersMigration implements MigrationInterface
 
     /**
      * @inheritdoc
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function rollback(): void
     {
