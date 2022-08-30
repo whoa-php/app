@@ -36,19 +36,22 @@ class UserRules implements ResourceAuthorizationRulesInterface
     use RulesTrait;
 
     /** @var string Action name */
-    public const ACTION_VIEW_USERS = 'canViewUsers';
-
-    /** @var string Action name */
     public const ACTION_CREATE_USER = 'canCreateUser';
 
     /** @var string Action name */
-    public const ACTION_EDIT_USER = 'canEditUser';
+    public const ACTION_READ_USERS = 'canViewUsers';
 
     /** @var string Action name */
-    public const ACTION_VIEW_ROLE = 'canViewRole';
+    public const ACTION_UPDATE_USER = 'canEditUser';
 
     /** @var string Action name */
-    public const ACTION_VIEW_OAUTH_TOKENS = 'canViewOAuthTokens';
+    public const ACTION_DELETE_USER = 'canDeleteUser';
+
+    /** @var string Action name */
+    public const ACTION_READ_ROLE = 'canViewRole';
+
+    /** @var string Action name */
+    public const ACTION_READ_OAUTH_TOKENS = 'canViewOAuthTokens';
 
     /**
      * @inheritdoc
@@ -64,20 +67,9 @@ class UserRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canViewUsers(ContextInterface $context): bool
-    {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_VIEW_USERS);
-    }
-
-    /**
-     * @param ContextInterface $context
-     * @return bool
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
     public static function canCreateUser(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_USERS);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_USER_WRITE) === true;
     }
 
     /**
@@ -86,9 +78,9 @@ class UserRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canEditUser(ContextInterface $context): bool
+    public static function canReadUsers(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_USERS);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_USER_READ) === true;
     }
 
     /**
@@ -97,10 +89,9 @@ class UserRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canViewRole(ContextInterface $context): bool
+    public static function canUpdateUser(ContextInterface $context): bool
     {
-        return RoleRules::canViewRoles($context) === true &&
-            self::canViewUsers($context) === true;
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_USER_WRITE) === true;
     }
 
     /**
@@ -109,8 +100,20 @@ class UserRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canViewOAuthTokens(ContextInterface $context): bool
+    public static function canReadRole(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_OAUTH);
+        return self::canReadUsers($context) === true &&
+            RoleRules::canReadRoles($context) === true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canReadOAuthTokens(ContextInterface $context): bool
+    {
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_OAUTH_WRITE) === true;
     }
 }

@@ -43,6 +43,27 @@ class OAuthScopesApi extends BaseApi
         parent::__construct($container, Model::class);
     }
 
+    //region CRUD
+
+    //region Read all resources
+
+    /**
+     * @inheritdoc
+     * @return PaginatedDataInterface
+     * @throws AuthorizationExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function index(): PaginatedDataInterface
+    {
+        $this->authorize(Rules::ACTION_READ_OAUTH_SCOPES, Schema::TYPE);
+
+        return parent::index();
+    }
+    //endregion(s
+
+    //region Create resource
+
     /**
      * @inheritdoc
      * @param string|null $index
@@ -59,6 +80,27 @@ class OAuthScopesApi extends BaseApi
 
         return parent::create($index, (array)$attributes, (array)$toMany);
     }
+    //endregion
+
+    //region Read resource
+
+    /**
+     * @inheritdoc
+     * @param string $index
+     * @return mixed|null
+     * @throws AuthorizationExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function read(string $index)
+    {
+        $this->authorize(Rules::ACTION_READ_OAUTH_SCOPES, Schema::TYPE, $index);
+
+        return parent::read($index);
+    }
+    //endregion
+
+    //region Update resource
 
     /**
      * @inheritdoc
@@ -72,10 +114,13 @@ class OAuthScopesApi extends BaseApi
      */
     public function update(string $index, iterable $attributes, iterable $toMany): int
     {
-        $this->authorize(Rules::ACTION_EDIT_OAUTH_SCOPE, Schema::TYPE, $index);
+        $this->authorize(Rules::ACTION_UPDATE_OAUTH_SCOPE, Schema::TYPE, $index);
 
         return parent::update($index, (array)$attributes, (array)$toMany);
     }
+    //endregion
+
+    //region Delete resource
 
     /**
      * @inheritdoc
@@ -87,39 +132,14 @@ class OAuthScopesApi extends BaseApi
      */
     public function remove(string $index): bool
     {
-        $this->authorize(Rules::ACTION_EDIT_OAUTH_SCOPE, Schema::TYPE, $index);
+        $this->authorize(Rules::ACTION_DELETE_OAUTH_SCOPE, Schema::TYPE, $index);
 
         return parent::remove($index);
     }
+    //endregion
+    //endregion
 
-    /**
-     * @inheritdoc
-     * @return PaginatedDataInterface
-     * @throws AuthorizationExceptionInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function index(): PaginatedDataInterface
-    {
-        $this->authorize(Rules::ACTION_VIEW_OAUTH_SCOPES, Schema::TYPE);
-
-        return parent::index();
-    }
-
-    /**
-     * @inheritdoc
-     * @param string $index
-     * @return mixed|null
-     * @throws AuthorizationExceptionInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function read(string $index)
-    {
-        $this->authorize(Rules::ACTION_VIEW_OAUTH_SCOPES, Schema::TYPE, $index);
-
-        return parent::read($index);
-    }
+    //region Relationship(s)
 
     /**
      * @param string|int $index
@@ -135,7 +155,7 @@ class OAuthScopesApi extends BaseApi
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
     ): PaginatedDataInterface {
-        $this->authorize(Rules::ACTION_VIEW_OAUTH_CLIENTS, Schema::TYPE, $index);
+        $this->authorize(Rules::ACTION_READ_OAUTH_CLIENTS, Schema::TYPE, $index);
 
         return $this->readRelationshipInt(
             $index,
@@ -159,7 +179,7 @@ class OAuthScopesApi extends BaseApi
         iterable $relationshipFilters = null,
         iterable $relationshipSorts = null
     ): PaginatedDataInterface {
-        $this->authorize(Rules::ACTION_VIEW_OAUTH_TOKENS, Schema::TYPE, $index);
+        $this->authorize(Rules::ACTION_READ_OAUTH_TOKENS, Schema::TYPE, $index);
 
         return $this->readRelationshipInt(
             $index,
@@ -168,4 +188,5 @@ class OAuthScopesApi extends BaseApi
             $relationshipSorts
         );
     }
+    //endregionss
 }

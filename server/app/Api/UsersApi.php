@@ -52,6 +52,28 @@ class UsersApi extends BaseApi
         parent::__construct($container, Model::class);
     }
 
+    //region CRUD
+
+    //region Read all resources
+
+    /**
+     * @inheritdoc
+     * @return PaginatedDataInterface
+     * @throws AuthorizationExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws DBALException
+     * @throws NotFoundExceptionInterface
+     */
+    public function index(): PaginatedDataInterface
+    {
+        $this->authorize(Rules::ACTION_READ_USERS, Schema::TYPE);
+
+        return parent::index();
+    }
+    //endregion
+
+    //region Create resource
+
     /**
      * @inheritdoc
      * @param string|null $index
@@ -69,6 +91,28 @@ class UsersApi extends BaseApi
 
         return parent::create($index, $this->getReplacePasswordWithHash((array)$attributes), (array)$toMany);
     }
+    //endregion
+
+    //region Read resource
+
+    /**
+     * @inheritdoc
+     * @param string $index
+     * @return mixed|null
+     * @throws AuthorizationExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws DBALException
+     * @throws NotFoundExceptionInterface
+     */
+    public function read(string $index)
+    {
+        $this->authorize(Rules::ACTION_READ_USERS, Schema::TYPE, $index);
+
+        return parent::read($index);
+    }
+    //endregion
+
+    //region Update resource
 
     /**
      * @inheritdoc
@@ -83,10 +127,13 @@ class UsersApi extends BaseApi
      */
     public function update(string $index, array $attributes, array $toMany): int
     {
-        $this->authorize(Rules::ACTION_EDIT_USER, Schema::TYPE, $index);
+        $this->authorize(Rules::ACTION_UPDATE_USER, Schema::TYPE, $index);
 
         return parent::update($index, $this->getReplacePasswordWithHash((array)$attributes), $toMany);
     }
+    //endregion
+
+    //region Delete resource
 
     /**
      * @inheritdoc
@@ -99,41 +146,60 @@ class UsersApi extends BaseApi
      */
     public function remove(string $index): bool
     {
-        $this->authorize(Rules::ACTION_EDIT_USER, Schema::TYPE, $index);
+        $this->authorize(Rules::ACTION_DELETE_USER, Schema::TYPE, $index);
 
         return parent::remove($index);
     }
+    //endregion
+    //endregion
+
+    //region Relationship(s)
 
     /**
-     * @inheritdoc
+     * @param string|int $index
+     * @param iterable|null $relationshipFilters
+     * @param iterable|null $relationshipSorts
      * @return PaginatedDataInterface
-     * @throws AuthorizationExceptionInterface
      * @throws ContainerExceptionInterface
-     * @throws DBALException
      * @throws NotFoundExceptionInterface
+     * @throws AuthorizationExceptionInterface
      */
-    public function index(): PaginatedDataInterface
-    {
-        $this->authorize(Rules::ACTION_VIEW_USERS, Schema::TYPE);
+    public function readRole(
+        $index,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
+    ): PaginatedDataInterface {
+        $this->authorize(Rules::ACTION_READ_ROLE, Schema::TYPE, $index);
 
-        return parent::index();
+        return $this->readRelationshipInt($index, Model::REL_ROLE, $relationshipFilters, $relationshipSorts);
     }
 
     /**
-     * @inheritdoc
-     * @param string $index
-     * @return mixed|null
-     * @throws AuthorizationExceptionInterface
+     * @param string|int $index
+     * @param iterable|null $relationshipFilters
+     * @param iterable|null $relationshipSorts
+     * @return PaginatedDataInterface
      * @throws ContainerExceptionInterface
-     * @throws DBALException
      * @throws NotFoundExceptionInterface
+     * @throws AuthorizationExceptionInterface
      */
-    public function read(string $index)
-    {
-        $this->authorize(Rules::ACTION_VIEW_USERS, Schema::TYPE, $index);
+    public function readOAuthTokens(
+        $index,
+        iterable $relationshipFilters = null,
+        iterable $relationshipSorts = null
+    ): PaginatedDataInterface {
+        $this->authorize(Rules::ACTION_READ_OAUTH_TOKENS, Schema::TYPE, $index);
 
-        return parent::read($index);
+        return $this->readRelationshipInt(
+            $index,
+            Model::REL_OAUTH_TOKENS,
+            $relationshipFilters,
+            $relationshipSorts
+        );
     }
+    //endregion
+
+    //region Helper function(s)
 
     /**
      * @param int $userId
@@ -247,47 +313,5 @@ class UsersApi extends BaseApi
     {
         return $this->getContainer()->get(HasherInterface::class);
     }
-
-    /**
-     * @param string|int $index
-     * @param iterable|null $relationshipFilters
-     * @param iterable|null $relationshipSorts
-     * @return PaginatedDataInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws AuthorizationExceptionInterface
-     */
-    public function readRole(
-        $index,
-        iterable $relationshipFilters = null,
-        iterable $relationshipSorts = null
-    ): PaginatedDataInterface {
-        $this->authorize(Rules::ACTION_VIEW_ROLE, Schema::TYPE, $index);
-
-        return $this->readRelationshipInt($index, Model::REL_ROLE, $relationshipFilters, $relationshipSorts);
-    }
-
-    /**
-     * @param string|int $index
-     * @param iterable|null $relationshipFilters
-     * @param iterable|null $relationshipSorts
-     * @return PaginatedDataInterface
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws AuthorizationExceptionInterface
-     */
-    public function readOAuthTokens(
-        $index,
-        iterable $relationshipFilters = null,
-        iterable $relationshipSorts = null
-    ): PaginatedDataInterface {
-        $this->authorize(Rules::ACTION_VIEW_OAUTH_TOKENS, Schema::TYPE, $index);
-
-        return $this->readRelationshipInt(
-            $index,
-            Model::REL_OAUTH_TOKENS,
-            $relationshipFilters,
-            $relationshipSorts
-        );
-    }
+    //endregion
 }

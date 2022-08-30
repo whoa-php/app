@@ -35,16 +35,19 @@ class OAuthRedirectUriRules implements ResourceAuthorizationRulesInterface
     use RulesTrait;
 
     /** @var string Action name */
-    public const ACTION_VIEW_OAUTH_REDIRECT_URIS = 'canViewOAuthRedirectUris';
-
-    /** @var string Action name */
     public const ACTION_CREATE_OAUTH_REDIRECT_URI = 'canCreateOAuthRedirectUri';
 
     /** @var string Action name */
-    public const ACTION_EDIT_OAUTH_REDIRECT_URI = 'canEditOAuthRedirectUri';
+    public const ACTION_READ_OAUTH_REDIRECT_URIS = 'canReadOAuthRedirectUris';
 
     /** @var string Action name */
-    public const ACTION_VIEW_OAUTH_CLIENT = 'canEditOAuthClient';
+    public const ACTION_UPDATE_OAUTH_REDIRECT_URI = 'canUpdateOAuthRedirectUri';
+
+    /** @var string Action name */
+    public const ACTION_DELETE_OAUTH_REDIRECT_URI = 'canDeleteOAuthRedirectUri';
+
+    /** @var string Action name */
+    public const ACTION_READ_OAUTH_CLIENT = 'canUpdateOAuthClient';
 
     /**
      * @inheritDoc
@@ -60,20 +63,9 @@ class OAuthRedirectUriRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canViewOAuthRedirectUris(ContextInterface $context): bool
-    {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_OAUTH);
-    }
-
-    /**
-     * @param ContextInterface $context
-     * @return bool
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
     public static function canCreateOAuthRedirectUri(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_OAUTH);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_OAUTH_WRITE) === true;
     }
 
     /**
@@ -82,9 +74,9 @@ class OAuthRedirectUriRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canEditOAuthRedirectUri(ContextInterface $context): bool
+    public static function canReadOAuthRedirectUris(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_OAUTH);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_OAUTH_READ) === true;
     }
 
     /**
@@ -93,8 +85,31 @@ class OAuthRedirectUriRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canViewOAuthClient(ContextInterface $context): bool
+    public static function canUpdateOAuthRedirectUri(ContextInterface $context): bool
     {
-        return OAuthClientRules::canViewOAuthClients($context);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_OAUTH_WRITE) === true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canDeleteOAuthRedirectUri(ContextInterface $context): bool
+    {
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_OAUTH_WRITE) === true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canReadOAuthClient(ContextInterface $context): bool
+    {
+        return self::canReadOAuthRedirectUris($context) === true &&
+            OAuthClientRules::canReadOAuthClients($context) === true;
     }
 }

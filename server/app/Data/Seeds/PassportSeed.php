@@ -45,88 +45,140 @@ class PassportSeed implements SeedInterface
     use PassportSeedTrait;
     use SeedTrait;
 
-    /** @var string Scope identifier */
-    public const SCOPE_IDENTIFIER = 'identifier';
-
-    /** @var string Scope identifier */
-    public const SCOPE_IDENTIFIER_ADMIN_OAUTH = 'manage_oauth';
-
-    /** @var string Scope identifier */
-    public const SCOPE_IDENTIFIER_ADMIN_ROLES = 'manage_roles';
-
-    /** @var string Scope identifier */
-    public const SCOPE_IDENTIFIER_ADMIN_USERS = 'manage_users';
-
-    /** @var string Scope identifier */
-    public const SCOPE_IDENTIFIER_VIEW_ROLES = 'view_roles';
-
-    /** @var string Scope identifier */
-    public const SCOPE_IDENTIFIER_VIEW_USERS = 'view_users';
+    //region Scope fields
 
     /** @var string Scope name */
     public const SCOPE_NAME = 'name';
 
-    /** @var string Scope name */
-    public const SCOPE_NAME_ADMIN_OAUTH = 'OAuth management';
-
-    /** @var string Scope name */
-    public const SCOPE_NAME_ADMIN_ROLES = 'Roles management';
-
-    /** @var string Scope name */
-    public const SCOPE_NAME_ADMIN_USERS = 'Users management';
-
-    /** @var string Scope name */
-    public const SCOPE_NAME_VIEW_ROLES = 'Roles access';
-
-    /** @var string Scope name */
-    public const SCOPE_NAME_VIEW_USERS = 'Users access';
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER = 'identifier';
 
     /** @var string Scope description */
     public const SCOPE_DESCRIPTION = 'description';
+    //endregion
+
+    //region OAuth scopes
+
+    //region Administrative scope
+
+    /** @var string Scope name */
+    public const SCOPE_NAME_OAUTH_WRITE = 'OAuth administrative scope';
+
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER_OAUTH_WRITE = 'OAuth.Write';
 
     /** @var string Scope description */
-    public const SCOPE_DESCRIPTION_ADMIN_OAUTH =
-        'Can create, update and delete OAuth clients, redirect URIs and scopes.';
+    public const SCOPE_DESCRIPTION_OAUTH_WRITE = 'Can create, update and delete OAuth client, redirect URI and scope.';
+    //endregion
+
+    //region Read scope
+
+    /** @var string Scope name */
+    public const SCOPE_NAME_OAUTH_READ = 'OAuth read scope';
+
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER_OAUTH_READ = 'OAuth.Read';
 
     /** @var string Scope description */
-    public const SCOPE_DESCRIPTION_ADMIN_ROLES = 'Can create, update and delete roles.';
+    public const SCOPE_DESCRIPTION_OAUTH_READ = 'Can read OAuth clients, redirect URIs and scopes.';
+    //endregion
+    //endregion
+
+    //region Role scopes
+
+    //region Administrative scope
+
+    /** @var string Scope name */
+    public const SCOPE_NAME_ROLE_WRITE = 'Role administrative scope';
+
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER_ROLE_WRITE = 'Role.Write';
 
     /** @var string Scope description */
-    public const SCOPE_DESCRIPTION_ADMIN_USERS = 'Can create, update and delete users.';
+    public const SCOPE_DESCRIPTION_ROLE_WRITE = 'Can create, update and delete role.';
+    //endregion
+
+    //region Read scope
+
+    /** @var string Scope name */
+    public const SCOPE_NAME_ROLE_READ = 'Role read scope';
+
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER_ROLE_READ = 'Role.Read';
 
     /** @var string Scope description */
-    public const SCOPE_DESCRIPTION_VIEW_ROLES = 'Can view roles.';
+    public const SCOPE_DESCRIPTION_ROLE_READ = 'Can read roles.';
+    //endregion
+    //endregion
+
+    //region User scopes
+
+    //region Administrative scope
+
+    /** @var string Scope name */
+    public const SCOPE_NAME_USER_WRITE = 'User administrative scope';
+
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER_USER_WRITE = 'User.Write';
 
     /** @var string Scope description */
-    public const SCOPE_DESCRIPTION_VIEW_USERS = 'Can view users.';
+    public const SCOPE_DESCRIPTION_USER_WRITE = 'Can create, update and delete user.';
+    //endregion
+
+    //region Read scope
+
+    /** @var string Scope name */
+    public const SCOPE_NAME_USER_READ = 'User read scope';
+
+    /** @var string Scope identifier */
+    public const SCOPE_IDENTIFIER_USER_READ = 'User.Read';
+
+    /** @var string Scope description */
+    public const SCOPE_DESCRIPTION_USER_READ = 'Can read users.';
+    //endregion
+    //endregion
 
     /** @var array Default scopes */
     public const DEFAULT_SCOPES = [
+        //region OAuth scopes
+
         [
-            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_ADMIN_OAUTH,
-            self::SCOPE_NAME => self::SCOPE_NAME_ADMIN_OAUTH,
-            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_ADMIN_OAUTH,
+            self::SCOPE_NAME => self::SCOPE_NAME_OAUTH_WRITE,
+            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_OAUTH_WRITE,
+            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_OAUTH_WRITE,
         ],
         [
-            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_ADMIN_ROLES,
-            self::SCOPE_NAME => self::SCOPE_NAME_ADMIN_ROLES,
-            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_ADMIN_ROLES,
+            self::SCOPE_NAME => self::SCOPE_NAME_OAUTH_READ,
+            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_OAUTH_READ,
+            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_OAUTH_READ,
+        ],
+        //endregion
+        //region Role scopes
+
+        [
+            self::SCOPE_NAME => self::SCOPE_NAME_ROLE_WRITE,
+            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_ROLE_WRITE,
+            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_ROLE_WRITE,
         ],
         [
-            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_ADMIN_USERS,
-            self::SCOPE_NAME => self::SCOPE_NAME_ADMIN_USERS,
-            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_ADMIN_USERS,
+            self::SCOPE_NAME => self::SCOPE_NAME_ROLE_READ,
+            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_ROLE_READ,
+            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_ROLE_READ,
+        ],
+        //endregion
+        //region User scopes
+
+        [
+            self::SCOPE_NAME => self::SCOPE_NAME_USER_WRITE,
+            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_USER_WRITE,
+            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_USER_WRITE,
         ],
         [
-            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_VIEW_ROLES,
-            self::SCOPE_NAME => self::SCOPE_NAME_VIEW_ROLES,
-            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_VIEW_ROLES,
+            self::SCOPE_NAME => self::SCOPE_NAME_USER_READ,
+            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_USER_READ,
+            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_USER_READ,
         ],
-        [
-            self::SCOPE_IDENTIFIER => self::SCOPE_IDENTIFIER_VIEW_USERS,
-            self::SCOPE_NAME => self::SCOPE_NAME_VIEW_USERS,
-            self::SCOPE_DESCRIPTION => self::SCOPE_DESCRIPTION_VIEW_USERS,
-        ],
+        //endregion
     ];
 
     /**
@@ -176,23 +228,24 @@ class PassportSeed implements SeedInterface
 
         // assign scopes to roles
         $this->assignScopes(RolesSeed::ID_ADMINISTRATORS, [
-            $scopes[static::SCOPE_IDENTIFIER_ADMIN_OAUTH],
-            $scopes[static::SCOPE_IDENTIFIER_ADMIN_ROLES],
-            $scopes[static::SCOPE_IDENTIFIER_ADMIN_USERS],
-            $scopes[static::SCOPE_IDENTIFIER_VIEW_ROLES],
-            $scopes[static::SCOPE_IDENTIFIER_VIEW_USERS],
+            $scopes[static::SCOPE_IDENTIFIER_OAUTH_WRITE],
+            $scopes[static::SCOPE_IDENTIFIER_OAUTH_READ],
+            $scopes[static::SCOPE_IDENTIFIER_ROLE_WRITE],
+            $scopes[static::SCOPE_IDENTIFIER_ROLE_READ],
+            $scopes[static::SCOPE_IDENTIFIER_USER_WRITE],
+            $scopes[static::SCOPE_IDENTIFIER_USER_READ],
         ]);
 
         $this->assignScopes(RolesSeed::ID_MODERATORS, [
-            $scopes[static::SCOPE_IDENTIFIER_ADMIN_ROLES],
-            $scopes[static::SCOPE_IDENTIFIER_ADMIN_USERS],
-            $scopes[static::SCOPE_IDENTIFIER_VIEW_ROLES],
-            $scopes[static::SCOPE_IDENTIFIER_VIEW_USERS],
+            $scopes[static::SCOPE_IDENTIFIER_ROLE_WRITE],
+            $scopes[static::SCOPE_IDENTIFIER_ROLE_READ],
+            $scopes[static::SCOPE_IDENTIFIER_USER_WRITE],
+            $scopes[static::SCOPE_IDENTIFIER_USER_READ],
         ]);
 
         $this->assignScopes(RolesSeed::ID_USERS, [
-            $scopes[static::SCOPE_IDENTIFIER_VIEW_ROLES],
-            $scopes[static::SCOPE_IDENTIFIER_VIEW_USERS],
+            $scopes[static::SCOPE_IDENTIFIER_ROLE_READ],
+            $scopes[static::SCOPE_IDENTIFIER_USER_READ],
         ]);
     }
 

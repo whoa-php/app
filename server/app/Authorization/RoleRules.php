@@ -36,16 +36,19 @@ class RoleRules implements ResourceAuthorizationRulesInterface
     use RulesTrait;
 
     /** @var string Action name */
-    public const ACTION_VIEW_ROLES = 'canViewRoles';
-
-    /** @var string Action name */
     public const ACTION_CREATE_ROLE = 'canCreateRole';
 
     /** @var string Action name */
-    public const ACTION_EDIT_ROLE = 'canEditRole';
+    public const ACTION_READ_ROLES = 'canViewRoles';
 
     /** @var string Action name */
-    public const ACTION_VIEW_USERS = 'canViewUsers';
+    public const ACTION_UPDATE_ROLE = 'canEditRole';
+
+    /** @var string Action name */
+    public const ACTION_DELETE_ROLE = 'canDeleteRole';
+
+    /** @var string Action name */
+    public const ACTION_READ_USERS = 'canViewUsers';
 
     /**
      * @inheritdoc
@@ -57,26 +60,13 @@ class RoleRules implements ResourceAuthorizationRulesInterface
 
     /**
      * @param ContextInterface $context
-     *
-     * @return bool
-     *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public static function canViewRoles(ContextInterface $context): bool
-    {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_VIEW_ROLES);
-    }
-
-    /**
-     * @param ContextInterface $context
      * @return bool
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
     public static function canCreateRole(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_ROLES);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ROLE_WRITE) === true;
     }
 
     /**
@@ -85,9 +75,9 @@ class RoleRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canEditRole(ContextInterface $context): bool
+    public static function canReadRoles(ContextInterface $context): bool
     {
-        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ADMIN_ROLES);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ROLE_READ) === true;
     }
 
     /**
@@ -96,10 +86,31 @@ class RoleRules implements ResourceAuthorizationRulesInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function canViewUsers(ContextInterface $context): bool
+    public static function canUpdateRole(ContextInterface $context): bool
     {
-        return
-            self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_VIEW_ROLES) &&
-            self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_VIEW_USERS);
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ROLE_WRITE) === true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canDeleteRole(ContextInterface $context): bool
+    {
+        return self::hasScope($context, PassportSeed::SCOPE_IDENTIFIER_ROLE_WRITE) === true;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function canReadUsers(ContextInterface $context): bool
+    {
+        return self::canReadRoles($context) === true &&
+            UserRules::canReadUsers($context) === true;
     }
 }

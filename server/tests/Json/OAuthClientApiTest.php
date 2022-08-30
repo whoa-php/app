@@ -63,7 +63,7 @@ class OAuthClientApiTest extends TestCase
         $this->setPreventCommits();
 
         $clientIdentifier = 'default_client';
-        $scopeIdentifier = PassportSeed::SCOPE_IDENTIFIER_ADMIN_OAUTH;
+        $scopeIdentifier = PassportSeed::SCOPE_IDENTIFIER_OAUTH_WRITE;
         $queryParams = [
             'filter' => [
                 'identifier' => [
